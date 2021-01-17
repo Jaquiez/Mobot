@@ -35,6 +35,9 @@
     <Content Include=".env" />
     <Content Include="app.js" />
     <Content Include="commands\clear.js">
+    <Content Include="commands\mute.js" />
+    <Content Include="commands\unmute.js" />
+    <Content Includ="command\nuke.js" />
       <SubType>Code</SubType>
     </Content>
     <Content Include="package.json" />
