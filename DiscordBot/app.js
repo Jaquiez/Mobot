@@ -31,17 +31,30 @@ client.on('message', message => {
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();   
 
-    if (command.startsWith('clear'))
-    {
+    if (command.startsWith('clear')) {
         if (message.member.hasPermission('MANAGE_MESSAGES')) {
             client.commands.get('clear').execute(message, args);
         }
-        else
-        {
+        else {
             message.channel.send("You don't have the permissions to do this! " + `${message.author}`);
         }
     }
-
+    else if (command.startsWith('mute')) {
+        if (message.member.hasPermission('MUTE_MEMBERS')) {
+            client.commands.get('mute').execute(message, args);
+        }
+        else {
+            message.channel.send("You don't have the permissions to do this! " + `${message.author}`);
+        }
+    }
+    else if (command.startsWith('unmute')) {
+        if (message.member.hasPermission('MUTE_MEMBERS')) {
+            client.commands.get('unmute').execute(message, args);
+        }
+        else {
+            message.channel.send("You don't have the permissions to do this! " + `${message.author}`);
+        }
+    }
 
 
 });

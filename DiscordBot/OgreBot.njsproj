@@ -5,7 +5,7 @@
     <Name>OgreBot</Name>
     <RootNamespace>DiscordBot</RootNamespace>
     <Environment>
-</Environment>
+    </Environment>
     <SaveNodeJsSettingsInProjectFile>True</SaveNodeJsSettingsInProjectFile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -37,6 +37,8 @@
     <Content Include="commands\clear.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="commands\mute.js" />
+    <Content Include="commands\unmute.js" />
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>
