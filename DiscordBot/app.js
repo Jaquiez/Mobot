@@ -1,4 +1,4 @@
-require("dotenv").config();
+    require("dotenv").config();
 const Discord = require('discord.js');
 
 const client = new Discord.Client();
@@ -31,17 +31,18 @@ client.on('message', message => {
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();   
 
-    if (command.startsWith('clear'))
-    {
+    if (command.startsWith('clear')) {
         if (message.member.hasPermission('MANAGE_MESSAGES')) {
             client.commands.get('clear').execute(message, args);
         }
-        else
-        {
+        else {
             message.channel.send("You don't have the permissions to do this! " + `${message.author}`);
         }
     }
-
+    else if (command == 'nuke')
+    {
+        client.commands.get('nuke').execute(message, args);
+    }
 
 
 });

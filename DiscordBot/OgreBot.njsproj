@@ -5,7 +5,7 @@
     <Name>OgreBot</Name>
     <RootNamespace>DiscordBot</RootNamespace>
     <Environment>
-</Environment>
+    </Environment>
     <SaveNodeJsSettingsInProjectFile>True</SaveNodeJsSettingsInProjectFile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -35,6 +35,9 @@
     <Content Include=".env" />
     <Content Include="app.js" />
     <Content Include="commands\clear.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="commands\nuke.js">
       <SubType>Code</SubType>
     </Content>
     <Content Include="package.json" />
