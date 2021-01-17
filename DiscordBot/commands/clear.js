@@ -20,7 +20,7 @@ module.exports = {
             }
             else
             {               
-                message.channel.send('That isn\'t a valid number');
+                message.channel.send('That is not a valid number');
             }
         }
         catch(error)
