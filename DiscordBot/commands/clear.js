@@ -9,7 +9,7 @@ module.exports = {
         //try to clear a valid number of messages
         //Discord API only allows messaged for deletion to be less than 2 weeks old
         try {
-            if (numberOfMessagesToDelete > 0 && numberOfMessagesToDelete<99)
+            if (numberOfMessagesToDelete > 1 && numberOfMessagesToDelete<99)
             {
                 message.channel.bulkDelete(numberOfMessagesToDelete, true);
                 message.channel.send('CLEARED ' + (numberOfMessagesToDelete - 1) + ' MESSAGE(S)!');
