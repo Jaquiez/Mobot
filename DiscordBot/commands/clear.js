@@ -8,22 +8,25 @@ module.exports = {
         const numberOfMessagesToDelete = 1 + parseInt(command.substring(command.indexOf(' ')).trimEnd());
         //try to clear a valid number of messages
         //Discord API only allows messaged for deletion to be less than 2 weeks old
-        //Find a work around later
-        //Also check for user roles to ensure only valid users can use this command
         try {
-            if (numberOfMessagesToDelete > 0 && numberOfMessagesToDelete < 99)
+            if (numberOfMessagesToDelete > 0 && numberOfMessagesToDelete<99)
             {
                 message.channel.bulkDelete(numberOfMessagesToDelete, true);
                 message.channel.send('CLEARED ' + (numberOfMessagesToDelete - 1) + ' MESSAGE(S)!');
             }
-            else
+            else if (numberOfMessagesToDelete > 99)
             {
-                message.channel.send('INVALID NUMBER!');
+                message.channel.send('I can only remove 99 messages at a time!');
+            }
+            else
+            {               
+                message.channel.send('That is not a valid number');
             }
         }
-        catch
+        catch(error)
         {
-            message.channel.send('NOT A VALID NUMBER >:(');
+            message.channel.send('ERROR');
+            console.error(error);
         }       
     }
 }

@@ -30,10 +30,19 @@ client.on('message', message => {
 
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();   
+
     if (command.startsWith('clear'))
     {
-        client.commands.get('clear').execute(message, args);            
+        if (message.member.hasPermission('MANAGE_MESSAGES')) {
+            client.commands.get('clear').execute(message, args);
+        }
+        else
+        {
+            message.channel.send("You don't have the permissions to do this! " + `${message.author}`);
+        }
     }
+
+
 
 });
 client.login(process.env.TOKEN);
