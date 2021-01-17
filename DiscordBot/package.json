@@ -1,0 +1,11 @@
+{
+  "name": "discord-bot",
+  "version": "0.0.0",
+  "description": "DiscordBot",
+  "main": "app.js",
+  "author": "Jaquiez + DatGuyQuan",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^12.5.1"
+  }
+}
