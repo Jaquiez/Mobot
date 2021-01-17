@@ -35,7 +35,8 @@ client.on('message', message => {
         if (message.member.hasPermission('MANAGE_MESSAGES')) {
             client.commands.get('clear').execute(message, args);
         }
-        else {
+        else
+        {
             message.channel.send("You don't have the permissions to do this! " + `${message.author}`);
         }
     }
