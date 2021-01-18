@@ -34,9 +34,11 @@
   <ItemGroup>
     <Content Include=".env" />
     <Content Include="app.js" />
+    <Content Include="commands\ban.js" />
     <Content Include="commands\clear.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="commands\kick.js" />
     <Content Include="commands\mute.js" />
     <Content Include="commands\nuke.js" />
     <Content Include="commands\unmute.js" />

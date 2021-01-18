@@ -2,7 +2,7 @@ module.exports = {
     name: 'mute',
     description: 'mutes a member',
 
-    
+    // Mutes a member by removing their "Infidel" role and replacing it with a "mute" role
     execute(message, args) {
         const target = message.mentions.users.first();
         if (target) {

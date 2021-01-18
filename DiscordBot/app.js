@@ -54,14 +54,28 @@ client.on('message', message => {
             message.channel.send("You don't have the permissions to do this! " + `${message.author}`);
         }
     }
-    else if (command === 'nuke')
-    {
-        if (message.member.hasPermission('MANAGE_CHANNELS'))
-        {            
+    else if (command === 'nuke') {
+        if (message.member.hasPermission('MANAGE_CHANNELS')) {
             client.commands.get('nuke').execute(message, args, Discord, client);
             return;
         }
-        else{
+        else {
+            message.channel.send("You don't have the permissions to do this! " + `${message.author}`);
+        }
+    }
+    else if (command === 'ban') {
+        if (message.member.hasPermission('BAN_MEMBERS')) {
+            client.commands.get('ban').execute(message, args);
+        }
+        else {
+            message.channel.send("You don't have the permissions to do this! " + `${message.author}`);
+        }
+    }
+    else if (command === 'kick') {
+        if (message.member.hasPermission('KICK_MEMBERS')) {
+            client.commands.get('kick').execute(message, args);
+        }
+        else {
             message.channel.send("You don't have the permissions to do this! " + `${message.author}`);
         }
     }
