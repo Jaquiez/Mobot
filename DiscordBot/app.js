@@ -79,6 +79,14 @@ client.on('message', message => {
             message.channel.send("You don't have the permissions to do this! " + `${message.author}`);
         }
     }
+    else if (command === 'unban') {
+        if (message.member.hasPermission('BAN_MEMBERS')) {
+            client.commands.get('unban').execute(message, args);
+        }
+        else {
+            message.channel.send("You don't have the permissions to do this! " + `${message.author}`);
+        }
+    }
 
 });
 client.login(process.env.TOKEN);
