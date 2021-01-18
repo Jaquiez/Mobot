@@ -24,7 +24,6 @@ for (const file of commandFiles) {
 }
 
 
-
 client.on('message', message => {
     if (!message.content.startsWith(prefix) || message.author.bot) return;
 
@@ -52,6 +51,17 @@ client.on('message', message => {
             client.commands.get('unmute').execute(message, args);
         }
         else {
+            message.channel.send("You don't have the permissions to do this! " + `${message.author}`);
+        }
+    }
+    else if (command === 'nuke')
+    {
+        if (message.member.hasPermission('MANAGE_CHANNELS'))
+        {            
+            client.commands.get('nuke').execute(message, args, Discord, client);
+            return;
+        }
+        else{
             message.channel.send("You don't have the permissions to do this! " + `${message.author}`);
         }
     }

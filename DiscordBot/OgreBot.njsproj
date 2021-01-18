@@ -38,6 +38,7 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="commands\mute.js" />
+    <Content Include="commands\nuke.js" />
     <Content Include="commands\unmute.js" />
     <Content Include="package.json" />
     <Content Include="README.md" />
