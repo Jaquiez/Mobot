@@ -24,6 +24,11 @@ for (const file of commandFiles) {
 }
 
 
+client.on("guildMemberAdd", function (member) {
+    console.log("GUIDMEMBERADD IS HAPPENING TO " + member.displayName);
+    console.log(`a user joins a guild: ${member.tag}`);
+});
+
 client.on('message', message => {
     if (!message.content.startsWith(prefix) || message.author.bot) return;
 
