@@ -25,12 +25,8 @@ for (const file of commandFiles) {
 
 
 //welcome message
-
-const welcomeChannelId = '604510005365833740'
-
 client.on("guildMemberAdd", (member) => {
-
-
+    const welcomeChannelId = '604510005365833740' //channel ID of wherever you want the welcome messages to be sent
     const welcomeChannel = member.guild.channels.cache.get(welcomeChannelId)
 
     const embed = new Discord.MessageEmbed()
@@ -40,8 +36,6 @@ client.on("guildMemberAdd", (member) => {
         .setImage('https://media1.tenor.com/images/f4500ab70d99a48fffc974f6c6ca3178/tenor.gif?itemid=20423677');
 
     welcomeChannel.send(embed);
-
-
 });
 
 client.on('message', message => {
