@@ -24,7 +24,7 @@ for (const file of commandFiles) {
 }
 
 
-//welcome message
+//welcome message and assign default role
 client.on("guildMemberAdd", (member) => {
     const welcomeChannelId = '604510005365833740' //channel ID of wherever you want the welcome messages to be sent
     const welcomeChannel = member.guild.channels.cache.get(welcomeChannelId)
@@ -36,6 +36,9 @@ client.on("guildMemberAdd", (member) => {
         .setImage('https://media1.tenor.com/images/f4500ab70d99a48fffc974f6c6ca3178/tenor.gif?itemid=20423677');
 
     welcomeChannel.send(embed);
+
+    const welcomeRole = member.guild.roles.cache.find(role => role.name === 'Infidel'); //exact name of role to be assigned on join
+    member.roles.add(welcomeRole);
 });
 
 client.on('message', message => {
