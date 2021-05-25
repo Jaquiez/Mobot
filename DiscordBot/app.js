@@ -112,6 +112,9 @@ client.on('message', message => {
             message.channel.send("You don't have the permissions to do this! " + `${message.author}`);
         }
     }
+    else if (command.startsWith('image')) {
+        client.commands.get('image').execute(message, args);
+    }
 
 });
 client.login(process.env.TOKEN);
