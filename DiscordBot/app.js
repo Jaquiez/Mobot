@@ -24,9 +24,24 @@ for (const file of commandFiles) {
 }
 
 
-client.on("guildMemberAdd", function (member) {
-    console.log("GUIDMEMBERADD IS HAPPENING TO " + member.displayName);
-    console.log(`a user joins a guild: ${member.tag}`);
+//welcome message
+
+const welcomeChannelId = '604510005365833740'
+
+client.on("guildMemberAdd", (member) => {
+
+
+    const welcomeChannel = member.guild.channels.cache.get(welcomeChannelId)
+
+    const embed = new Discord.MessageEmbed()
+        .setTitle('RETARD ALERT')
+        .setDescription(`Welcome <@${member.id}> to the shithole`)
+        .setColor('#ff1122')
+        .setImage('https://media1.tenor.com/images/f4500ab70d99a48fffc974f6c6ca3178/tenor.gif?itemid=20423677');
+
+    welcomeChannel.send(embed);
+
+
 });
 
 client.on('message', message => {
