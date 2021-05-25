@@ -3,8 +3,11 @@ module.exports = {
     description: 'makes the bot say whatever follows the command',
         
     execute(message, args) {
-        const toSay = args.toString().substring(args.indexOf(' '))
-
+        var toSay = "";
+        for(var word of args)
+        {
+            toSay += word + " ";
+        }
         if (toSay) {
             message.channel.bulkDelete(1, true);
             message.channel.send(toSay);
