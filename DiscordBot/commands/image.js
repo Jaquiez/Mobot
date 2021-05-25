@@ -11,7 +11,7 @@ module.exports = {
     name: 'image',
     description: 'sends an image to discord text channel',
 
-    async execute(message, args) {
+    async execute(client, message, args) {
         const image_query = args.join(' ');
         if (!image_query) return message.channel.send('Put an image name dumbass');
 

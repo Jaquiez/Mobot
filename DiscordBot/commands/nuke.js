@@ -5,7 +5,7 @@ module.exports = {
     description: 'destroys current channel and creates new one with same properties',
 
     //Nukes the channel but if you nuke it multiple times while the bot is online it will create multiple nuke messages
-    execute(message, args, Discord, client) {
+    async execute(client, message, args, Discord) {
         message.channel.clone();    
         message.channel.delete('nuked');    
         client.on('channelCreate', channel => {

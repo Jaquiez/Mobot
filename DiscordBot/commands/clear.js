@@ -3,7 +3,7 @@ module.exports = {
     description: 'clears number of messages that user specifies',
 
 
-    execute(message, args) {
+    async execute(client, message, args) {
         try {
             const command = args.shift().toLowerCase();
             var numberOfMessagesToDelete = 1 + parseInt(command.substring(command.indexOf(' ')).trimEnd());

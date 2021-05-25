@@ -49,11 +49,27 @@
     <Content Include="commands\nuke.js" />
     <Content Include="commands\unban.js" />
     <Content Include="commands\unmute.js" />
+    <Content Include="events\client\ready.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="events\guild\message.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="handlers\command_handler.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="handlers\event_handler.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="commands\" />
+    <Folder Include="events\guild\" />
+    <Folder Include="events\client\" />
+    <Folder Include="handlers\" />
+    <Folder Include="events\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
 </Project>

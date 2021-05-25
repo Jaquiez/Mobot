@@ -3,7 +3,7 @@ module.exports = {
     description: 'Bans a member',
 
     // Bans one member at a time.
-    execute(message, args) {
+    async execute(client, message, args) {
         const target = message.mentions.users.first();
 
         if (target) {
