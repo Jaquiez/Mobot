@@ -101,6 +101,14 @@ client.on('message', message => {
             message.channel.send("You don't have the permissions to do this! " + `${message.author}`);
         }
     }
+    else if (command.startsWith('say')) {
+        if (message.member.hasPermission('MANAGE_MESSAGES')) {
+            client.commands.get('say').execute(message, args);
+        }
+        else {
+            message.channel.send("You don't have the permissions to do this! " + `${message.author}`);
+        }
+    }
 
 });
 client.login(process.env.TOKEN);
