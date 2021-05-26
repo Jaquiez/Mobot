@@ -40,6 +40,7 @@ module.exports = {
                     .setTitle(word)
                     .setDescription(definition)
                     .setColor('#ff1122')
+                    .setImage("https://miro.medium.com/max/4000/1*ctUugc4pAxlLweBOxzySLg.png")
                 message.channel.send(embed);
             }
             catch (e) {
