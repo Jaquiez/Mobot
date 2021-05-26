@@ -18,6 +18,7 @@ module.exports = {
             message.channel.send('The user has been unbanned. Don\'t fuck up.');
         } catch (e) {
             message.channel.send('An error has occured');
+            console.warn(e);
         }
     }
 }
