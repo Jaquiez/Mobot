@@ -9,7 +9,7 @@ const google = new Scraper({
 
 module.exports = {
     name: 'image',
-    description: 'Searches google for an image, and sends the first result. May take a few seconds after command is called.',
+    description: 'Searches google for an image and sends the first result. May take a few seconds to work after the command is called',
     permissions: [],
 
     async execute(client, message, args) {
