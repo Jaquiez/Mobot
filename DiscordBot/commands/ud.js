@@ -14,7 +14,7 @@ module.exports = {
     description: 'gets urban dictionary definition of word',
     permissions: [],
 
-    execute(client, message, args, Discord) {
+    async execute(client, message, args, Discord) {
         var balls = "";
         for (var word of args) {
             balls += word + " ";
@@ -22,23 +22,26 @@ module.exports = {
         const url = "https://www.urbandictionary.com/define.php?term=" + balls;
         console.log(url);
 
-        fetch(url).then(function (response) {
+        fetch(url).then(async function (response) {
             // The API call was successful!
             return response.text();
-        }).then(function (html) {
+        }).then(async function (html) {
             // This is the HTML from our response as a text string    
             const dom = new jsdom.JSDOM(html);
             try {
                 var definition = dom.window.document.getElementsByClassName("meaning").item(0).textContent;
                 var word = dom.window.document.getElementsByClassName("word").item(0).textContent;
+
+                const image_results = await google.scrape(word, 1);
+
                 if (definition.length > 2000) {
                     definition = definition.substring(0, 2000);
                 }
                 const embed = new Discord.MessageEmbed()
-                    .setTitle(word)
+                    .setTitle('Urban Dictionary - ' + word)
                     .setDescription(definition)
                     .setColor('#ff1122')
-                    .setImage("https://miro.medium.com/max/4000/1*ctUugc4pAxlLweBOxzySLg.png")
+                    .setImage(image_results[0].url)
                 message.channel.send(embed);
             }
             catch (e) {
