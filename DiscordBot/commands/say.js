@@ -1,6 +1,7 @@
 module.exports = {
     name: 'say',
     description: 'makes the bot say whatever follows the command',
+    permissions: [],
         
     async execute(client, message, args) {
         var toSay = "";

@@ -1,7 +1,7 @@
 module.exports = {
     name: 'clear',
     description: 'clears number of messages that user specifies',
-
+    permissions: ["MANAGE_MESSAGES"],
 
     async execute(client, message, args) {
         try {

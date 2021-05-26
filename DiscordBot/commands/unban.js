@@ -1,6 +1,7 @@
 module.exports = {
     name: 'unban',
     description: 'Unbans a member from their user ID',
+    permissions: ["BAN_MEMBERS"],
 
     // Unbans a member from their user ID, can't unban from @ mention
     // Also, can't @ mention a member in chat after they have been unbanned because they aren't in the server anymore

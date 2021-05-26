@@ -1,6 +1,7 @@
 module.exports = {
     name: 'kick',
     description: 'Kicks a member',
+    permissions: ["KICK_MEMBERS"],
 
     // Kicks one member at a time. 
     async execute(client, message, args) {
