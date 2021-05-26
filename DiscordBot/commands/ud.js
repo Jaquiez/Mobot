@@ -13,17 +13,15 @@ module.exports = {
     name: 'ud',
     description: 'gets urban dictionary definition of word',
     permissions: [],
-    // Unbans a member from their user ID, can't unban from @ mention
-    // Also, can't @ mention a member in chat after they have been unbanned because they aren't in the server anymore
+
     execute(client, message, args, Discord) {
-
-
         var balls = "";
         for (var word of args) {
             balls += word + " ";
         }
         const url = "https://www.urbandictionary.com/define.php?term=" + balls;
         console.log(url);
+
         fetch(url).then(function (response) {
             // The API call was successful!
             return response.text();
