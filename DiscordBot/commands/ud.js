@@ -20,8 +20,6 @@ module.exports = {
             balls += word + " ";
         }
         const url = "https://www.urbandictionary.com/define.php?term=" + balls;
-        console.log(url);
-
         fetch(url).then(async function (response) {
             // The API call was successful!
             return response.text();
@@ -31,9 +29,7 @@ module.exports = {
             try {
                 var definition = dom.window.document.getElementsByClassName("meaning").item(0).textContent;
                 var word = dom.window.document.getElementsByClassName("word").item(0).textContent;
-
                 const image_results = await google.scrape(word, 1);
-
                 if (definition.length > 2000) {
                     definition = definition.substring(0, 2000);
                 }
