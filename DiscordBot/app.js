@@ -1,3 +1,6 @@
+//npm install dotenv
+//npm install images-scraper
+
 require("dotenv").config();
 const Discord = require('discord.js');
 
