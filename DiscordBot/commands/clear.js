@@ -1,9 +1,9 @@
 module.exports = {
     name: 'clear',
     description: 'clears number of messages that user specifies',
+    permissions: ["MANAGE_MESSAGES"],
 
-
-    execute(message, args) {
+    async execute(client, message, args) {
         try {
             const command = args.shift().toLowerCase();
             var numberOfMessagesToDelete = 1 + parseInt(command.substring(command.indexOf(' ')).trimEnd());

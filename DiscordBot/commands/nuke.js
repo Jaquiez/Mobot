@@ -3,9 +3,10 @@ const { MessageEmbed, Message, Channel, TextChannel } = require("discord.js");
 module.exports = {
     name: 'nuke',
     description: 'destroys current channel and creates new one with same properties',
+    permissions: ["MANAGE_CHANNELS"],
 
     //Nukes the channel but if you nuke it multiple times while the bot is online it will create multiple nuke messages
-    execute(message, args, Discord, client) {
+    async execute(client, message, args, Discord) {
         message.channel.clone();    
         message.channel.delete('nuked');    
         client.on('channelCreate', channel => {
