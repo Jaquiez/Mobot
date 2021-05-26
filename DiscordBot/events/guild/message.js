@@ -42,23 +42,32 @@ module.exports = (Discord, client, message) => {
     ]
 
     //loops throught the validPermissions list, checking if each perm of the command exists and if the user has the required perm
-    if (command.permissions.length) {
-        let invalidPerms = []
-        for (const perm of command.permissions) {
-            if (!validPermissions.includes(perm)) {
-                return console.log(`The ${perm} perm doesn't exist moron, check the command file`)
-            }
-            if (!message.member.hasPermission(perm)) {
-                invalidPerms.push(perm);
-                break;
-            }
-        }
-        if (invalidPerms.length) {
-            return message.channel.send(`You don't have the ${invalidPerms} perm moron`);
-        }
-    }
 
-    if (command) command.execute(client, message, args, Discord);
+    try {
+        if (command.permissions.length) {
+            let invalidPerms = []
+            for (const perm of command.permissions) {
+                if (!validPermissions.includes(perm)) {
+                    return console.log(`The ${perm} perm doesn't exist moron, check the command file`)
+                }
+                if (!message.member.hasPermission(perm)) {
+                    invalidPerms.push(perm);
+                    break;
+                }
+            }
+            if (invalidPerms.length) {
+                return message.channel.send(`You don't have the ${invalidPerms} perm moron`);
+            }
+        }
+
+
+        if (command) command.execute(client, message, args, Discord);
+    } catch {
+        message.channel.send('Not a real command dipfuck');
+    }
+    
+   
+    
 
     
 }
