@@ -44,6 +44,9 @@
     <Content Include="commands\image.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="commands\r34.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="commands\say.js">
       <SubType>Code</SubType>
     </Content>

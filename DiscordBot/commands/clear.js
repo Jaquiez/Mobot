@@ -18,6 +18,7 @@ module.exports = {
             {
                 message.channel.bulkDelete(numberOfMessagesToDelete, true);
                 message.channel.send('CLEARED ' + (numberOfMessagesToDelete - 1) + ' MESSAGE(S)!');
+                //message.channel.bulkDelete(1);
             }
             else
             {
@@ -29,5 +30,6 @@ module.exports = {
             message.channel.send(error.toString());
             console.error(error);
         }       
+        
     }
 }
