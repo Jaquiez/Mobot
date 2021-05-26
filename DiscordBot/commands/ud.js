@@ -11,7 +11,7 @@ const google = new Scraper({
 
 module.exports = {
     name: 'ud',
-    description: 'gets urban dictionary definition of word',
+    description: 'Gets the urban dictionary definition of a word/term, and the first google image result of that word/term',
     permissions: [],
 
     async execute(client, message, args, Discord) {

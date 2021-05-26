@@ -1,6 +1,6 @@
 module.exports = {
     name: 'mute',
-    description: 'mutes a member',
+    description: 'Mutes a member',
     permissions: ["MUTE_MEMBERS"],
 
     // Mutes a member by removing their "Infidel" role and replacing it with a "mute" role

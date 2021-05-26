@@ -9,7 +9,7 @@ const google = new Scraper({
 
 module.exports = {
     name: 'image',
-    description: 'sends an image to discord text channel',
+    description: 'Searches google for an image, and sends the first result. May take a few seconds after command is called.',
     permissions: [],
 
     async execute(client, message, args) {

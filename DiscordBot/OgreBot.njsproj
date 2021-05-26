@@ -38,6 +38,9 @@
     <Content Include="commands\clear.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="commands\help.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="commands\image.js">
       <SubType>Code</SubType>
     </Content>

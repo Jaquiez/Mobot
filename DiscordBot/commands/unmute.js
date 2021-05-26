@@ -1,6 +1,6 @@
 module.exports = {
     name: 'unmute',
-    description: 'unmutes a member',
+    description: 'Unmutes a member',
     permissions: ["MUTE_MEMBERS"],
 
     // Unmutes a member by removing the "mute" role and giving them the "Infidel" role.

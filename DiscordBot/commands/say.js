@@ -1,6 +1,6 @@
 module.exports = {
     name: 'say',
-    description: 'makes the bot say whatever follows the command',
+    description: 'Makes the bot say whatever follows the command, and deletes the call to the command from the chat',
     permissions: [],
         
     async execute(client, message, args) {
