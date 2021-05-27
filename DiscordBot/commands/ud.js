@@ -1,14 +1,6 @@
 var Scraper = require('images-scraper');
 const fetch = require("node-fetch");
 const jsdom = require("jsdom");
-
-const google = new Scraper({
-    puppeteer: {
-        headless: true
-    }
-
-});
-
 module.exports = {
     name: 'ud',
     description: 'Gets the urban dictionary definition of a word/term, and the first google image result of that word/term',
@@ -35,7 +27,7 @@ module.exports = {
                 const embed = new Discord.MessageEmbed()
                     .setTitle('Urban Dictionary - ' + word)
                     .setDescription(definition)
-                    .setColor('#ff1122')
+                    .setColor('#093396')
                     .setImage("https://miro.medium.com/max/4000/1*ctUugc4pAxlLweBOxzySLg.png")
                 message.channel.send(embed);
             }

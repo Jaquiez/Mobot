@@ -1,12 +1,11 @@
+const queue = new Map();
 module.exports = (Discord, client, message) => {
     const prefix = '.';
     if (!message.content.startsWith(prefix) || message.author.bot) return;
-
     const args = message.content.slice(prefix.length).split(/ +/);
     const cmd = args.shift().toLowerCase();
 
     const command = client.commands.get(cmd);
-
     const validPermissions = [
         "CREATE_INSTANT_INVITE",
         "KICK_MEMBERS",
@@ -40,7 +39,7 @@ module.exports = (Discord, client, message) => {
         "MANAGE_WEBHOOKS",
         "MANAGE_EMOJIS",
     ]
-
+    
     //loops throught the validPermissions list, checking if each perm of the command exists and if the user has the required perm
 
     try {
@@ -60,10 +59,14 @@ module.exports = (Discord, client, message) => {
             }
         }
 
-
-        if (command) command.execute(client, message, args, Discord);
+        //Creates two variables for music bot
+        
+        //const serverQueue = queue.get(message.guild.id);
+        if (command) {
+            command.execute(client, message, args, Discord,queue, queue);
+        }
     } catch {
-        message.channel.send('Not a real command dipfuck');
+        message.channel.send('Not a real command bitch');
     }
     
    

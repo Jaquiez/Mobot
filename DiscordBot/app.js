@@ -1,11 +1,18 @@
 //npm install dotenv
 //npm install images-scraper
+//npm install ytdl - core@latest
+//npm install yt-search
+//npm install ffmpeg
+//npm i ffmpeg-static
 
+
+//npm install -g windows-build-tools
 require("dotenv").config();
 const Discord = require('discord.js');
 const message = require("./events/guild/message");
-
 const client = new Discord.Client();
+
+
 
 //new event and command handler bullshit, idk how it works but it does
 client.commands = new Discord.Collection();
@@ -13,6 +20,7 @@ client.events = new Discord.Collection();
 
 ['command_handler', 'event_handler'].forEach(handler => {
     require(`./handlers/${handler}`)(client, Discord);
+
 })
 
 
@@ -34,5 +42,7 @@ client.on("guildMemberAdd", (member) => {
     }
 
 });
+
+
 
 client.login(process.env.TOKEN);

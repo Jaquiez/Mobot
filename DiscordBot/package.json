@@ -6,8 +6,13 @@
     "author": "Jaquiez + DatGuyQuan",
     "license": "ISC",
     "dependencies": {
+        "@discordjs/opus": "^0.5.0",
         "discord.js": "^12.5.1",
         "dotenv": "^8.2.0",
-        "images-scraper": "^6.3.0"
+        "ffmpeg": "0.0.4",
+        "ffmpeg-static": "^4.3.0",
+        "images-scraper": "^6.3.0",
+        "yt-search": "^2.8.0",
+        "ytdl-core": "^4.8.2"
     }
 }

@@ -2,13 +2,6 @@ var Scraper = require('images-scraper');
 const fetch = require("node-fetch");
 const jsdom = require("jsdom");
 
-const google = new Scraper({
-    puppeteer: {
-        headless: true
-    }
-
-});
-
 module.exports = {
     name: 'r34',
     description: 'Gives you a random r34 image of said thing',
@@ -35,13 +28,10 @@ module.exports = {
                         arr.push(link.href)
                     }                   
                 });
-                arr.forEach(val => {
-                    console.log(val);
-                });
                 var url = arr[Math.floor(Math.random() * arr.length)];
                 const embed = new Discord.MessageEmbed()
                     .setTitle('Rule 34: ' + balls)
-                    .setColor('#ff1122')
+                    .setColor('#05ab08')
                     .setImage(url)
                 message.channel.send(embed);
             }

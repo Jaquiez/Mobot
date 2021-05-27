@@ -44,6 +44,12 @@
     <Content Include="commands\image.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="commands\play.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="commands\q.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="commands\r34.js">
       <SubType>Code</SubType>
     </Content>
@@ -53,6 +59,9 @@
     <Content Include="commands\kick.js" />
     <Content Include="commands\mute.js" />
     <Content Include="commands\nuke.js" />
+    <Content Include="commands\skip.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="commands\ud.js">
       <SubType>Code</SubType>
     </Content>
