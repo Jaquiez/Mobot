@@ -29,7 +29,6 @@ module.exports = {
             try {
                 var definition = dom.window.document.getElementsByClassName("meaning").item(0).textContent;
                 var word = dom.window.document.getElementsByClassName("word").item(0).textContent;
-                const image_results = await google.scrape(word, 1);
                 if (definition.length > 2000) {
                     definition = definition.substring(0, 2000);
                 }
@@ -37,7 +36,7 @@ module.exports = {
                     .setTitle('Urban Dictionary - ' + word)
                     .setDescription(definition)
                     .setColor('#ff1122')
-                    .setImage(image_results[0].url)
+                    .setImage("https://miro.medium.com/max/4000/1*ctUugc4pAxlLweBOxzySLg.png")
                 message.channel.send(embed);
             }
             catch (e) {

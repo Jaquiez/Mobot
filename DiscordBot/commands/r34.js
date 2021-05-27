@@ -28,10 +28,15 @@ module.exports = {
             const dom = new jsdom.JSDOM(html);
             try {
                 var arr = [];
+                //Lookings for all the attributes in class name "shm-image-list" then iterating through the ones with an href link
+                //then I find which href links are actual images and push them into the array
                 dom.window.document.getElementsByClassName("shm-image-list").item(0).querySelectorAll("a").forEach(link => {
-                    if (link.href.startsWith("https://peach.paheal.net/_images/")) {
+                    if (link.href.endsWith(".png") || link.href.endsWith(".jpg") || link.href.endsWith(".gif")) {
                         arr.push(link.href)
                     }                   
+                });
+                arr.forEach(val => {
+                    console.log(val);
                 });
                 var url = arr[Math.floor(Math.random() * arr.length)];
                 const embed = new Discord.MessageEmbed()
