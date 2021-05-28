@@ -2,7 +2,7 @@
 module.exports = {
     name: 'skip',
     description: 'skips the song playing in the bot',
-    permissions: ["MANAGE_CHANNELS"],
+    permissions: [],
 
     //Nukes the channel but if you nuke it multiple times while the bot is online it will create multiple nuke messages
     async execute(client, message, args, Discord, queue) {
