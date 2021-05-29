@@ -1,4 +1,3 @@
-var Scraper = require('images-scraper');
 const fetch = require("node-fetch");
 const jsdom = require("jsdom");
 

@@ -2,12 +2,14 @@ const ytdl = require('ytdl-core');
 const { execute } = require('./clear');
 const ytSearch = require('yt-search');
 const message = require('../events/guild/message');
-
+const fetch = require("node-fetch");
+const jsdom = require("jsdom");
+const { indexOf } = require('ffmpeg-static');
 module.exports = {
     name: 'play',
     description: 'Plays the song specified',
     permissions: [],
-
+    
     async execute(client, message, args, Discord, queue) {
         //Handles actually playing the video from the queue, at the end of a song it shifts all songs one spot to the left then playings the first song
         const video_player = async (guild, song) => {
@@ -45,7 +47,7 @@ module.exports = {
 
         const serverQueue = queue.get(message.guild.id);
         let song = {};
-
+        var songsInQ = [];
         //Checks if link is sent, if so just take the info from the link
         //If not look up and "find" the video on youtube
         if (ytdl.validateURL(args[0])) {
@@ -55,7 +57,47 @@ module.exports = {
                 url: songInfo.videoDetails.video_url,
             };
         }
-        else {
+        else if (args[0].startsWith("https://www.youtube.com/playlist?list="))
+        {
+            const url = args[0];
+            const checkYTUrl = async (url) => {
+                fetch(url).then(async function (response) {
+                    // The API call was successful!
+                    return response.text();
+                }).then(async function (html) {
+                    // This is the HTML from our response as a text string    
+                    const dom = new jsdom.JSDOM(html);
+                    let songs = [];
+                    dom.window.document.querySelectorAll("script").forEach(thing => {
+                        var script = thing.innerHTML;
+                        if (script.indexOf("var ytInitialData =") > -1) {
+                            //JSON.parse(script);
+                            var playlistScript = script.substring(script.indexOf("var ytInitialData = ") + "var ytInitialData = ".length, script.indexOf(";", script.indexOf("var ytInitialData =")))
+                            var parsedScript = JSON.parse(playlistScript)
+                            //console.log(parsedScript.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].playlistVideoListRenderer.contents);
+                            parsedScript.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].playlistVideoListRenderer.contents.forEach(object => {
+                                var songTitle = object.playlistVideoRenderer.title.runs[0].text
+                                var url = "https://www.youtube.com" + object.playlistVideoRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url
+                                song = {
+                                    title: songTitle,
+                                    url: url,
+                                };
+                                songs.push(song)
+                            });
+                            console.log(songs);
+                            return songs;
+                        }
+                    });
+                }).catch(function (err) {
+                    // There was an error
+                    console.warn('Something went wrong.', err);
+                    return [];
+                });
+            }
+
+            songsInQ = await checkYTUrl(url);
+        }
+        else{
             const find_video = async (query) => {
                 const videoResult = await ytSearch(query);
                 return (videoResult.videos.length > 1) ? videoResult.videos[0] : null;
@@ -72,6 +114,7 @@ module.exports = {
             }
         }
         if (!serverQueue) {
+            console.log(songsInQ);
             const queueConstructor = {
                 voice_channel: voiceChannel,
                 text_channel: message.channel,
@@ -79,16 +122,25 @@ module.exports = {
                 songs: []
             }
             queue.set(message.guild.id, queueConstructor);
-            console.log(song);
-            console.log(song.length);
             if ("title" in song) {
-                queueConstructor.songs.push(song);
+                if (songsInQ.length > 0) {
+                    console.log()
+                    for (pong in songsInQ) {
+                        queueConstructor.songs.push(pong);
+                        console.log(pong);
+                    }
+                }
+                else {
+                    queueConstructor.songs.push(song);
+                    console.log(song);
+                }                         
             }
             else
             {
                 return;
             }
             try {
+                console.log(serverQueue)
                 const connection = await voiceChannel.join();
                 queueConstructor.connection = connection;
                 video_player(message.guild, queueConstructor.songs[0]);
@@ -100,12 +152,24 @@ module.exports = {
             }
         } else {
             if ("title" in song) {
-                serverQueue.songs.push(song);
-                console.log(serverQueue.songs);
-                const embed = new Discord.MessageEmbed()
-                    .setTitle(`${song.title} has been added to the queue!`)
-                    .setColor('#7508cf')
-                return message.channel.send(embed);
+                if (songsInQ.length > 0) {
+                    for (pong in songsInQ) {
+                        serverQueue.songs.push(pong);
+                    }
+                    const embed = new Discord.MessageEmbed()
+                        .setTitle(`${songsInQ.length} songs have been added to the queue!`)
+                        .setColor('#7508cf')
+                    return message.channel.send(embed);
+                }
+                else {
+                    serverQueue.songs.push(song);
+                    console.log(serverQueue.songs);
+                    const embed = new Discord.MessageEmbed()
+                        .setTitle(`${song.title} has been added to the queue!`)
+                        .setColor('#7508cf')
+                    return message.channel.send(embed);
+                }              
+               
             }
             else {
                 return;

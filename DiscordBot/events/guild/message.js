@@ -4,7 +4,6 @@ module.exports = (Discord, client, message) => {
     if (!message.content.startsWith(prefix) || message.author.bot) return;
     const args = message.content.slice(prefix.length).split(/ +/);
     const cmd = args.shift().toLowerCase();
-
     const command = client.commands.get(cmd);
     const validPermissions = [
         "CREATE_INSTANT_INVITE",
@@ -41,7 +40,6 @@ module.exports = (Discord, client, message) => {
     ]
     
     //loops throught the validPermissions list, checking if each perm of the command exists and if the user has the required perm
-
     try {
         if (command.permissions.length) {
             let invalidPerms = []
@@ -63,7 +61,7 @@ module.exports = (Discord, client, message) => {
         
         //const serverQueue = queue.get(message.guild.id);
         if (command) {
-            command.execute(client, message, args, Discord,queue, queue);
+            command.execute(client, message, args, Discord, queue);
         }
     } catch {
         message.channel.send('Not a real command bitch');

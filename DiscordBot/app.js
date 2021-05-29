@@ -7,6 +7,7 @@
 
 
 //npm install -g windows-build-tools
+//npm install @discordjs/opus
 require("dotenv").config();
 const Discord = require('discord.js');
 const message = require("./events/guild/message");
