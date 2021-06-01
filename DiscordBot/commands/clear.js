@@ -1,35 +1,15 @@
 module.exports = {
     name: 'clear',
-    description: 'Clears the number of messages that the user specifies',
-    permissions: ["MANAGE_MESSAGES"],
-
-    async execute(client, message, args) {
-        try {
-            const command = args.shift().toLowerCase();
-            var numberOfMessagesToDelete = 1 + parseInt(command.substring(command.indexOf(' ')).trimEnd());
+    description: 'Clears the entire queue of songs',
+    permissions: [],
+    async execute(client, message, args, Discord, queue) {
+        const serverQueue = await queue.get(message.guild.id);
+        if (serverQueue) {
+            serverQueue.songs = [];
+            serverQueue.connection.dispatcher.end();
         }
-        catch {
-            var numberOfMessagesToDelete = 0;
+        else {
+            return message.channel.send("There are no songs in queue bruh.")
         }
-        //try to clear a valid number of messages
-        //Discord API only allows messaged for deletion to be less than 2 weeks old
-        try {
-            if (numberOfMessagesToDelete > 1 && numberOfMessagesToDelete<101)
-            {
-                message.channel.bulkDelete(numberOfMessagesToDelete, true);
-                message.channel.send('CLEARED ' + (numberOfMessagesToDelete - 1) + ' MESSAGE(S)!');
-                //message.channel.bulkDelete(1);
-            }
-            else
-            {
-                message.channel.send('Pick a number between 1 and 99 bruh');
-            }
-        }
-        catch(error)
-        {
-            message.channel.send(error.toString());
-            console.error(error);
-        }       
-        
     }
 }

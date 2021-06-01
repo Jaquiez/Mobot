@@ -24,7 +24,7 @@ module.exports = {
             }
             const embed = new Discord.MessageEmbed()
                 .setTitle(`Queue`)
-                .setDescription(` **${ting}**`)
+                .setDescription(`**${ting}**`)
                 .setColor('#7508cf')
             message.channel.send(embed);
         }       

@@ -59,6 +59,9 @@
     <Content Include="commands\kick.js" />
     <Content Include="commands\mute.js" />
     <Content Include="commands\nuke.js" />
+    <Content Include="commands\shuffle.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="commands\skip.js">
       <SubType>Code</SubType>
     </Content>

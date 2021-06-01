@@ -1,5 +1,5 @@
 const ytdl = require('ytdl-core');
-const { execute } = require('./clear');
+const { execute } = require('./clean');
 const ytSearch = require('yt-search');
 const message = require('../events/guild/message');
 const fetch = require("node-fetch");
@@ -57,7 +57,7 @@ module.exports = {
             };
         }
         //Checking if the arguments contains a youtube playlist
-        else if (args[0].startsWith("https://www.youtube.com/playlist?list="))
+        else if (args[0].startsWith("https://www.youtube.com/playlist?list=") || args[0].startsWith("https://youtube.com/playlist?list="))
         {
             let songs = [];
             const url = args[0];
@@ -90,17 +90,21 @@ module.exports = {
                             parsedScript.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].playlistVideoListRenderer.contents.forEach(object => {
                                 //Finally we get the song title and url after going through EVEN more contents of this giant data structure
                                 //put yt.com in front of url (because it is shortened) and you have your song
-                                var songTitle = object.playlistVideoRenderer.title.runs[0].text
-                                var url = "https://www.youtube.com" + object.playlistVideoRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url
-                                //Put it in the song kv pair object
-                                song = {
-                                    title: songTitle,
-                                    url: url,
-                                };
-                                //put that in the songs array and keep iterating
-                                songs.push(song)
+                                if (object.playlistVideoRenderer) {
+                                    var songTitle = object.playlistVideoRenderer.title.runs[0].text
+                                    var urlFrag = object.playlistVideoRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url;
+                                    var url = "https://www.youtube.com" + urlFrag.substring(0, urlFrag.indexOf("&list="));
+                                    //Put it in the song kv pair object
+                                    song = {
+                                        title: songTitle,
+                                        url: url,
+                                    };
+                                    //put that in the songs array and keep iterating
+                                    songs.push(song)
+                                }
                             });      
-                            //Resolve songs here because this basically says THIS is the promise we wanna return :)         
+                            //Resolve songs here because this basically says THIS is the promise we wanna return :)   
+                            //console.log(songs);
                             resolve(songs);
                         }
                     });
