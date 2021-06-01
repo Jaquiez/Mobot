@@ -142,8 +142,11 @@ module.exports = {
                 if (songsInQ.length > 0) {
                     songsInQ.forEach(song => {
                         queueConstructor.songs.push(song)
-                        console.log(song)
                     });
+                    const embed = new Discord.MessageEmbed()
+                    .setTitle(`${songsInQ.length} songs have been added to the queue!`)
+                    .setColor('#7508cf')
+                    message.channel.send(embed);
                 }
                 else {
                     queueConstructor.songs.push(song);                    
