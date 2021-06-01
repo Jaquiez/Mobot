@@ -59,23 +59,16 @@ module.exports = {
         }
         else if (args[0].startsWith("https://www.youtube.com/playlist?list="))
         {
+            let songs = [];
             const url = args[0];
-            function getYTPlaylist (url)
-            {
-                console.log("beginning of YTPlaylist project");
-                return new Promise(resolve =>
-                    {
-                        resolve = checkYTUrl(url);
-                    });
-            }
-            const checkYTUrl = async (url) => {
+            function checkYTURL(url) {
+                return new Promise(resolve => {                
                 fetch(url).then(async function (response) {
                     // The API call was successful!
                     return response.text();
                 }).then(async function (html) {
                     // This is the HTML from our response as a text string    
-                    const dom = new jsdom.JSDOM(html);
-                    let songs = [];
+                    const dom = new jsdom.JSDOM(html);               
                     dom.window.document.querySelectorAll("script").forEach(thing => {
                         var script = thing.innerHTML;
                         if (script.indexOf("var ytInitialData =") > -1) {
@@ -91,10 +84,8 @@ module.exports = {
                                     url: url,
                                 };
                                 songs.push(song)
-                            });
-                        console.log("YOU MADE IT");
-                            console.log(songs);
-                            return songs;
+                            });               
+                            resolve(songs);
                         }
                     });
                 }).catch(function (err) {
@@ -102,10 +93,9 @@ module.exports = {
                     console.warn('Something went wrong.', err);
                     return [];
                 });
+                })
             }
-
-            songsInQ = await getYTPlaylist(url);
-            console.log("YO MAMA");
+            songsInQ = await checkYTURL(url);
         }
         else{
             const find_video = async (query) => {
@@ -124,7 +114,6 @@ module.exports = {
             }
         }
         if (!serverQueue) {
-            console.log(songsInQ);
             const queueConstructor = {
                 voice_channel: voiceChannel,
                 text_channel: message.channel,
@@ -134,15 +123,13 @@ module.exports = {
             queue.set(message.guild.id, queueConstructor);
             if ("title" in song) {
                 if (songsInQ.length > 0) {
-                    console.log()
-                    for (pong in songsInQ) {
-                        queueConstructor.songs.push(pong);
-                        console.log(pong);
-                    }
+                    songsInQ.forEach(song => {
+                        queueConstructor.songs.push(song)
+                        console.log(song)
+                    });
                 }
                 else {
-                    queueConstructor.songs.push(song);
-                    console.log(song);
+                    queueConstructor.songs.push(song);                    
                 }                         
             }
             else
@@ -164,7 +151,10 @@ module.exports = {
             if ("title" in song) {
                 if (songsInQ.length > 0) {
                     for (pong in songsInQ) {
-                        serverQueue.songs.push(pong);
+                        songsInQ.forEach(song => {
+                            serverQueue.songs.push(song);
+                            console.log(song)
+                        });                       
                     }
                     const embed = new Discord.MessageEmbed()
                         .setTitle(`${songsInQ.length} songs have been added to the queue!`)
