@@ -8,7 +8,6 @@ module.exports = {
     async execute(client, message, args, Discord, queue) {
         const serverQueue = queue.get(message.guild.id);
         var ting = "";
-        console.log(serverQueue);
         if (serverQueue !== undefined) {
             for (var key in serverQueue.songs) {
                 ting += (parseInt(key) + 1) + ".) ";

@@ -60,6 +60,14 @@ module.exports = {
         else if (args[0].startsWith("https://www.youtube.com/playlist?list="))
         {
             const url = args[0];
+            function getYTPlaylist (url)
+            {
+                console.log("beginning of YTPlaylist project");
+                return new Promise(resolve =>
+                    {
+                        resolve = checkYTUrl(url);
+                    });
+            }
             const checkYTUrl = async (url) => {
                 fetch(url).then(async function (response) {
                     // The API call was successful!
@@ -84,6 +92,7 @@ module.exports = {
                                 };
                                 songs.push(song)
                             });
+                        console.log("YOU MADE IT");
                             console.log(songs);
                             return songs;
                         }
@@ -95,7 +104,8 @@ module.exports = {
                 });
             }
 
-            songsInQ = await checkYTUrl(url);
+            songsInQ = await getYTPlaylist(url);
+            console.log("YO MAMA");
         }
         else{
             const find_video = async (query) => {
@@ -110,7 +120,7 @@ module.exports = {
                 };
             }
             else {
-                message.channel.send("Could not find a video on: " + args.join(' '));
+                return message.channel.send("Could not find a video on: " + args.join(' '));
             }
         }
         if (!serverQueue) {
