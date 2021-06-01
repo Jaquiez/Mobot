@@ -9,7 +9,6 @@ module.exports = {
     name: 'play',
     description: 'Plays the song specified',
     permissions: [],
-    
     async execute(client, message, args, Discord, queue) {
         //Handles actually playing the video from the queue, at the end of a song it shifts all songs one spot to the left then playings the first song
         const video_player = async (guild, song) => {
@@ -57,34 +56,51 @@ module.exports = {
                 url: songInfo.videoDetails.video_url,
             };
         }
+        //Checking if the arguments contains a youtube playlist
         else if (args[0].startsWith("https://www.youtube.com/playlist?list="))
         {
             let songs = [];
             const url = args[0];
-            function checkYTURL(url) {
-                return new Promise(resolve => {                
+            //This can be an async or normal function it doesn't matter from what I can tell
+            async function checkYTURL(url) {
+                //This part matters, you must return a promise
+                //This promise means it will not return until something is resolved 
+                return new Promise(resolve => {      
+                //Get information AND THEN send the response to the next function          
                 fetch(url).then(async function (response) {
-                    // The API call was successful!
+                    // Use the response from the API Call to get the text
                     return response.text();
                 }).then(async function (html) {
-                    // This is the HTML from our response as a text string    
-                    const dom = new jsdom.JSDOM(html);               
+                    // HTML is the text from the response  
+                    //parse the HTML doc using JSDOM 
+                    const dom = new jsdom.JSDOM(html);  
+                    //Find all the scripts in the doc and iterate through them         
                     dom.window.document.querySelectorAll("script").forEach(thing => {
                         var script = thing.innerHTML;
+                        //The script with all the playlist data has this var
                         if (script.indexOf("var ytInitialData =") > -1) {
-                            //JSON.parse(script);
+                            //Take only the data within brackets of the var {all the bs inside}
+                            //This puts it in JSON notation
                             var playlistScript = script.substring(script.indexOf("var ytInitialData = ") + "var ytInitialData = ".length, script.indexOf(";", script.indexOf("var ytInitialData =")))
+                            //parse the string in JSON notation and now we have our data (after all that bs)
                             var parsedScript = JSON.parse(playlistScript)
-                            //console.log(parsedScript.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].playlistVideoListRenderer.contents);
+                            //This data has a bunch of bs we don't need so we sift the all the bs 
+                            //You can log the parsedScript in the console to see the possible contents then log the contents and so on
+                            //now iterate through that shit
                             parsedScript.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].playlistVideoListRenderer.contents.forEach(object => {
+                                //Finally we get the song title and url after going through EVEN more contents of this giant data structure
+                                //put yt.com in front of url (because it is shortened) and you have your song
                                 var songTitle = object.playlistVideoRenderer.title.runs[0].text
                                 var url = "https://www.youtube.com" + object.playlistVideoRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url
+                                //Put it in the song kv pair object
                                 song = {
                                     title: songTitle,
                                     url: url,
                                 };
+                                //put that in the songs array and keep iterating
                                 songs.push(song)
-                            });               
+                            });      
+                            //Resolve songs here because this basically says THIS is the promise we wanna return :)         
                             resolve(songs);
                         }
                     });
@@ -95,6 +111,7 @@ module.exports = {
                 });
                 })
             }
+            //DO NOT CONTINUE DOING ANYTHING until checkYTURL is done (await for return)
             songsInQ = await checkYTURL(url);
         }
         else{
