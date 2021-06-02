@@ -5,7 +5,6 @@ module.exports = {
     async execute(client, message, args, Discord, queue) {
         const serverQueue = await queue.get(message.guild.id);
         if (serverQueue !== undefined) {
-            console.log(serverQueue.songs);
             for (k = 1; k < serverQueue.songs.length; k++) {              
                 var randomNum = Math.floor(Math.random() * serverQueue.songs.length);
                 if (randomNum != 0) {
