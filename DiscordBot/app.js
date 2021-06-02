@@ -1,13 +1,5 @@
-//npm install dotenv
-//npm install images-scraper
-//npm install ytdl - core@latest
-//npm install yt-search
-//npm install ffmpeg
-//npm i ffmpeg-static
-
-
 //npm install -g windows-build-tools
-//npm install @discordjs/opus
+//npm install opusscripts
 require("dotenv").config();
 const Discord = require('discord.js');
 const message = require("./events/guild/message");
