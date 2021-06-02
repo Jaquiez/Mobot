@@ -30,7 +30,6 @@ module.exports = {
             //Also have to figure out the event for switching page on react to the embeded message
             if(ting.length > 2000)
             {
-                message.channel.send("Sorry I can't display the whole q yet, not developed enough :/")
                 ting = ting.substring(0,2000)
             }
             const embed = new Discord.MessageEmbed()
