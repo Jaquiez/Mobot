@@ -15,7 +15,9 @@ module.exports = {
             const songQueue = queue.get(guild.id);
 
             if (!song) {
-                songQueue.voice_channel.leave();
+                setTimeout(function () {
+                    songQueue.voice_channel.leave();
+                },100000);               
                 queue.delete(guild.id);
                 return;
             }

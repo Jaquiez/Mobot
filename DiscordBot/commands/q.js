@@ -8,12 +8,23 @@ module.exports = {
         const serverQueue = await queue.get(message.guild.id);
         var ting = "";
         if (serverQueue !== undefined) {    
-            for (var key in serverQueue.songs) {
-                ting += (parseInt(key) + 1) + ".) ";
-                for (var kay in serverQueue.songs[key]) {
-                    ting += serverQueue.songs[key][kay] + " | ";
+            if (serverQueue.songs.length > 10) {
+                for (k = 0; k < 10; k++) {
+                    ting += (k + 1) + ".) ";
+                    for (var kay in serverQueue.songs[k]) {
+                        ting += serverQueue.songs[k][kay] + " | ";
+                    }
+                    ting += "\n";
                 }
-                ting += "\n";
+            }
+            else {
+                for (var key in serverQueue.songs) {
+                    ting += (parseInt(key) + 1) + ".) ";
+                    for (var kay in serverQueue.songs[key]) {
+                        ting += serverQueue.songs[key][kay] + " | ";
+                    }
+                    ting += "\n";
+                }
             }
             //work around for now, rework to make pages that only display 8-10 songs at a time
             //Also have to figure out the event for switching page on react to the embeded message
