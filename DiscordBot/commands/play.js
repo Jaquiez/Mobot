@@ -17,10 +17,18 @@ module.exports = {
                 songQueue.connection.play();
             }
             if (!song) {
+                /*
                 setTimeout(function () {
-                    songQueue.voice_channel.leave();
-                },100000);               
+                    if (songQueue.songs.length >0) {
+                        console.log("Not gonna leave yet!")
+                    }
+                    else {
+                        console.log("Gotta dash!")
+                        songQueue.voice_channel.leave();
+                    }
+                }, 10000); */
                 queue.delete(guild.id);
+                songQueue.voice_channel.leave();
                 return;
             }
             const stream = ytdl(song.url, { filter: 'audioonly' });

@@ -18,7 +18,8 @@ module.exports = {
             slow: false,
             host: 'https://translate.google.com',
         });
-        let stream = url
+        let stream = url;
+        console.log(stream);
         
     }
 }

@@ -35,6 +35,7 @@
     <Content Include=".env" />
     <Content Include="app.js" />
     <Content Include="commands\ban.js" />
+    <Content Include="commands\clean.js" />
     <Content Include="commands\clear.js">
       <SubType>Code</SubType>
     </Content>
@@ -68,6 +69,7 @@
     <Content Include="commands\skip.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="commands\tts.js" />
     <Content Include="commands\ud.js">
       <SubType>Code</SubType>
     </Content>
