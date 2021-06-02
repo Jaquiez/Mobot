@@ -13,7 +13,9 @@ module.exports = {
         //Handles actually playing the video from the queue, at the end of a song it shifts all songs one spot to the left then playings the first song
         const video_player = async (guild, song) => {
             const songQueue = queue.get(guild.id);
-
+            if (songQueue.connection === null) {
+                songQueue.connection.play();
+            }
             if (!song) {
                 setTimeout(function () {
                     songQueue.voice_channel.leave();
