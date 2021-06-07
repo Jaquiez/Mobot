@@ -6,6 +6,7 @@ module.exports = {
     //PLEASE REWORK THIS
     async execute(client, message, args, Discord, queue) {
         const serverQueue = await queue.get(message.guild.id);
+        console.log(serverQueue.songs);
         var ting = "";
         if (serverQueue !== undefined) {    
             if (serverQueue.songs.length > 10) {

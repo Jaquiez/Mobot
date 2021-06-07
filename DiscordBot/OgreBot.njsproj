@@ -88,6 +88,9 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="package.json" />
+    <Content Include="quickstart.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="README.md" />
   </ItemGroup>
   <ItemGroup>

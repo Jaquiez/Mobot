@@ -2,9 +2,11 @@ const ytdl = require('ytdl-core');
 const { execute } = require('./clean');
 const ytSearch = require('yt-search');
 const message = require('../events/guild/message');
-const fetch = require("node-fetch");
-const jsdom = require("jsdom");
+//const fetch = require("node-fetch");
+//const jsdom = require("jsdom");
 const { indexOf } = require('ffmpeg-static');
+var { google } = require('googleapis');
+var OAuth2 = google.auth.OAuth2;
 module.exports = {
     name: 'play',
     description: 'Plays the song specified',
@@ -73,62 +75,49 @@ module.exports = {
         {
             let songs = [];
             const url = args[0];
-            //This can be an async or normal function it doesn't matter from what I can tell
-            async function checkYTURL(url) {
-                //This part matters, you must return a promise
-                //This promise means it will not return until something is resolved 
-                return new Promise(resolve => {      
-                //Get information AND THEN send the response to the next function          
-                fetch(url).then(async function (response) {
-                    // Use the response from the API Call to get the text
-                    return response.text();
-                }).then(async function (html) {
-                    // HTML is the text from the response  
-                    //parse the HTML doc using JSDOM 
-                    const dom = new jsdom.JSDOM(html);  
-                    //Find all the scripts in the doc and iterate through them         
-                    dom.window.document.querySelectorAll("script").forEach(thing => {
-                        var script = thing.innerHTML;
-                        //The script with all the playlist data has this var
-                        if (script.indexOf("var ytInitialData =") > -1) {
-                            //Take only the data within brackets of the var {all the bs inside}
-                            //This puts it in JSON notation
-                            var playlistScript = script.substring(script.indexOf("var ytInitialData = ") + "var ytInitialData = ".length, script.indexOf(";", script.indexOf("var ytInitialData =")))
-                            //parse the string in JSON notation and now we have our data (after all that bs)
-                            var parsedScript = JSON.parse(playlistScript)
-                            //This data has a bunch of bs we don't need so we sift the all the bs 
-                            //You can log the parsedScript in the console to see the possible contents then log the contents and so on
-                            //now iterate through that shit
-                            parsedScript.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].playlistVideoListRenderer.contents.forEach(object => {
-                                //Finally we get the song title and url after going through EVEN more contents of this giant data structure
-                                //put yt.com in front of url (because it is shortened) and you have your song
-                                if (object.playlistVideoRenderer) {
-                                    var songTitle = object.playlistVideoRenderer.title.runs[0].text
-                                    var urlFrag = object.playlistVideoRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url;
-                                    var url = "https://www.youtube.com" + urlFrag.substring(0, urlFrag.indexOf("&list="));
-                                    //Put it in the song kv pair object
-                                    song = {
-                                        title: songTitle,
-                                        url: url,
-                                    };
-                                    //put that in the songs array and keep iterating
-                                    songs.push(song)
-                                }
-                            });      
-                            //Resolve songs here because this basically says THIS is the promise we wanna return :)   
-                            //console.log(songs);
-                            resolve(songs);
+            function getVideos(url, nextToken) {
+                var service = google.youtube('v3');
+                var finished = false;
+                return new Promise(resolve => {
+                    service.playlistItems.list({
+                        "auth": process.env.API_KEY,
+                        "part": ["contentDetails", "snippet"],
+                        "maxResults": 45,
+                        "pageToken": nextToken,
+                        "playlistId": url.substring(url.indexOf("list=") + "list=".length)
+                    }, async function (err, response) {
+                        if (err) {
+                            console.log('The API returned an error: ' + err);
+                            return;
                         }
-                    });
-                }).catch(function (err) {
-                    // There was an error
-                    console.warn('Something went wrong.', err);
-                    return [];
+                        var playlist = response.data;
+                        if (playlist.length == 0) {
+                            console.log('Playlist not found');
+                        } else {
+                            playlist.items.forEach(element => {
+                                console.log(element.snippet.position)
+                                song = {
+                                    title: element.snippet.title,
+                                    url: "https://www.youtube.com/watch?v=" + element.contentDetails.videoId,
+                                };
+                                console.log(song);
+                                songs.push(song);
+                            })
+                            if (playlist.nextPageToken) {
+                                nextToken = playlist.nextPageToken;
+                                await getVideos(url, nextToken)
+                                resolve(songs);
+                            }
+                            else {
+                                resolve(songs);
+                                finished = true;
+                            }
+                        }
+                    })
                 });
-                })
             }
-            //DO NOT CONTINUE DOING ANYTHING until checkYTURL is done (await for return)
-            songsInQ = await checkYTURL(url);
+            songsInQ = await getVideos(url);
+
         }
         else{
             const find_video = async (query) => {
@@ -146,6 +135,7 @@ module.exports = {
                 return message.channel.send("Could not find a video on: " + args.join(' '));
             }
         }
+        console.log("AFTER");
         if (!serverQueue) {
             const queueConstructor = {
                 voice_channel: voiceChannel,
@@ -173,7 +163,7 @@ module.exports = {
                 return;
             }
             try {
-                console.log(serverQueue)
+                //console.log(serverQueue)
                 const connection = await voiceChannel.join();
                 queueConstructor.connection = connection;
                 video_player(message.guild, queueConstructor.songs[0]);
@@ -189,7 +179,6 @@ module.exports = {
                     for (pong in songsInQ) {
                         songsInQ.forEach(song => {
                             serverQueue.songs.push(song);
-                            console.log(song)
                         });                       
                     }
                     const embed = new Discord.MessageEmbed()
@@ -218,3 +207,61 @@ module.exports = {
 
     
 }
+
+//OLD IMPLIMENTATION
+/*
+//This can be an async or normal function it doesn't matter from what I can tell
+async function checkYTURL(url) {
+    //This part matters, you must return a promise
+    return new Promise(resolve => {
+    fetch(url).then(async function (response) {
+        // Use the response from the API Call to get the text
+        return response.text();
+    }).then(async function (html) {
+        //parse the HTML doc using JSDOM
+        const dom = new jsdom.JSDOM(html);
+        //Find all the scripts in the doc and iterate through them
+        dom.window.document.querySelectorAll("script").forEach(thing => {
+            var script = thing.innerHTML;
+            //This method is dumb because it only contains the first 100 songs [Will rework with Youtube Data API]
+            if (script.indexOf("var ytInitialData =") > -1) {
+                //Take only the data within brackets of the var {all the bs inside}
+                //This puts it in JSON notation
+                var playlistScript = script.substring(script.indexOf("var ytInitialData = ") + "var ytInitialData = ".length, script.indexOf(";", script.indexOf("var ytInitialData =")))
+                //parse the string in JSON notation and now we have our data (after all that bs)
+                var parsedScript = JSON.parse(playlistScript)
+                //This data has a bunch of bs we don't need so we sift the all the bs
+                //You can log the parsedScript in the console to see the possible contents then log the contents and so on
+                //now iterate through that shit
+                console.log(parsedScript.contents);
+                parsedScript.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].playlistVideoListRenderer.contents.forEach(object => {
+                    //Finally we get the song title and url after going through EVEN more contents of this giant data structure
+                    //put yt.com in front of url (because it is shortened) and you have your song
+                    if (object.playlistVideoRenderer) {
+                        var songTitle = object.playlistVideoRenderer.title.runs[0].text
+                        var urlFrag = object.playlistVideoRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url;
+                        var url = "https://www.youtube.com" + urlFrag.substring(0, urlFrag.indexOf("&list="));
+                        //Put it in the song kv pair object
+                        song = {
+                            title: songTitle,
+                            url: url,
+                        };
+                        //put that in the songs array and keep iterating
+                        songs.push(song)
+                    }
+                });
+                //Resolve songs here because this basically says THIS is the promise we wanna return :)
+                //console.log(songs);
+                resolve(songs);
+            }
+        });
+    }).catch(function (err) {
+        // There was an error
+        console.warn('Something went wrong.', err);
+        return [];
+    });
+   
+    })
+}
+//DO NOT CONTINUE DOING ANYTHING until checkYTURL is done (await for return)
+*/

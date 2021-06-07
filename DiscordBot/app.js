@@ -7,7 +7,7 @@ const client = new Discord.Client();
 
 
 
-//new event and command handler bullshit, idk how it works but it does
+//new event and command handler
 client.commands = new Discord.Collection();
 client.events = new Discord.Collection();
 
