@@ -34,7 +34,7 @@ module.exports = {
                 ting = ting.substring(0,2000)
             }
             const embed = new Discord.MessageEmbed()
-                .setTitle(`Queue`)
+                .setTitle(`Queue | ${serverQueue.songs.length} songs`)
                 .setDescription(`**${ting}**`)
                 .setColor('#7508cf')
             message.channel.send(embed);

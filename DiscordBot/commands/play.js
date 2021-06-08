@@ -75,7 +75,6 @@ module.exports = {
             const url = args[0];
             function getVideos(url, nextToken) {
                 var service = google.youtube('v3');
-                console.log("THIS IS GETTING CALLED")
                 return new Promise(resolve => {
                     service.playlistItems.list({
                         "auth": process.env.API_KEY,
@@ -90,25 +89,21 @@ module.exports = {
                         }
                         var playlist = response.data;
                         if (playlist.length == 0) {
-                            console.log('Playlist not found');
                         } else {
                             playlist.items.forEach(element => {
-                                console.log(element.snippet.position)
                                 song = {
                                     title: element.snippet.title,
                                     url: "https://www.youtube.com/watch?v=" + element.contentDetails.videoId,
                                 };
-                                console.log(song);
                                 songs.push(song);
                             })
                             if (playlist.nextPageToken) {
                                 nextToken = playlist.nextPageToken;
-                                await getVideos(url, nextToken)
+                                await getVideos(url, nextToken);
                                 resolve(songs);
                             }
                             else {
                                 resolve(songs);
-                                finished = true;
                             }
                         }
                     })
