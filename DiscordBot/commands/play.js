@@ -2,8 +2,6 @@ const ytdl = require('ytdl-core');
 const { execute } = require('./clean');
 const ytSearch = require('yt-search');
 const message = require('../events/guild/message');
-//const fetch = require("node-fetch");
-//const jsdom = require("jsdom");
 const { indexOf } = require('ffmpeg-static');
 var { google } = require('googleapis');
 var OAuth2 = google.auth.OAuth2;
@@ -77,7 +75,7 @@ module.exports = {
             const url = args[0];
             function getVideos(url, nextToken) {
                 var service = google.youtube('v3');
-                var finished = false;
+                console.log("THIS IS GETTING CALLED")
                 return new Promise(resolve => {
                     service.playlistItems.list({
                         "auth": process.env.API_KEY,
@@ -116,6 +114,7 @@ module.exports = {
                     })
                 });
             }
+            console.log("HELLOOOOOOOOOO??!!")
             songsInQ = await getVideos(url);
 
         }
