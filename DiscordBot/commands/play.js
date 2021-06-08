@@ -109,9 +109,7 @@ module.exports = {
                     })
                 });
             }
-            console.log("HELLOOOOOOOOOO??!!")
             songsInQ = await getVideos(url);
-
         }
         else{
             const find_video = async (query) => {
@@ -129,7 +127,6 @@ module.exports = {
                 return message.channel.send("Could not find a video on: " + args.join(' '));
             }
         }
-        console.log("AFTER");
         if (!serverQueue) {
             const queueConstructor = {
                 voice_channel: voiceChannel,
@@ -157,7 +154,6 @@ module.exports = {
                 return;
             }
             try {
-                //console.log(serverQueue)
                 const connection = await voiceChannel.join();
                 queueConstructor.connection = connection;
                 video_player(message.guild, queueConstructor.songs[0]);
@@ -170,11 +166,9 @@ module.exports = {
         } else {
             if ("title" in song) {
                 if (songsInQ.length > 0) {
-                    for (pong in songsInQ) {
-                        songsInQ.forEach(song => {
-                            serverQueue.songs.push(song);
-                        });                       
-                    }
+                    songsInQ.forEach(song => {
+                        serverQueue.songs.push(song);
+                    });                                           
                     const embed = new Discord.MessageEmbed()
                         .setTitle(`${songsInQ.length} songs have been added to the queue!`)
                         .setColor('#7508cf')
@@ -182,7 +176,6 @@ module.exports = {
                 }
                 else {
                     serverQueue.songs.push(song);
-                    console.log(serverQueue.songs);
                     const embed = new Discord.MessageEmbed()
                         .setTitle(`${song.title} has been added to the queue!`)
                         .setColor('#7508cf')
@@ -193,13 +186,8 @@ module.exports = {
             else {
                 return;
             }
-
         }
-                
-
-    }
-
-    
+    }    
 }
 
 //OLD IMPLIMENTATION
