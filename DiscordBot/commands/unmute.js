@@ -3,7 +3,7 @@ module.exports = {
     description: 'Unmutes a member',
     permissions: ["MUTE_MEMBERS"],
 
-    // Unmutes a member by removing the "mute" role and giving them the "Infidel" role.
+    // Unmutes a member by removing the "mute" role
     async execute(client, message, args) {
         const target = message.mentions.users.first();
         if (target) {

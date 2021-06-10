@@ -3,8 +3,7 @@ module.exports = {
     description: 'Mutes a member',
     permissions: ["MUTE_MEMBERS"],
 
-    // Mutes a member by removing their "Infidel" role and replacing it with a "mute" role
-    // Try to make this non-hardcoded, I'll give you two options.
+    // Mutes a member by removing their 
     async execute(client, message, args) {
         const target = message.mentions.users.first();
         if (target) {
@@ -13,9 +12,7 @@ module.exports = {
             
             //let muteRole = message.guild.roles.cache.find(role => role.name === 'mute');
             //let muteRole = message.guild.roles.cache.find(role => guild.roles.permissions.cache.find("SEND_MESSAGES") !== true);
-            let memberTarget = message.guild.members.cache.get(target.id);
-
-            
+            let memberTarget = message.guild.members.cache.get(target.id);            
             //memberTarget.roles.add(muteRole.id);
             //memberTarget.roles.remove(mainRole.id);
             //message.channel.send(`${memberTarget.user}` + ' has been muted');

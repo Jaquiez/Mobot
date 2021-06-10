@@ -17,16 +17,6 @@ module.exports = {
                 songQueue.connection.play();
             }
             if (!song) {
-                /*
-                setTimeout(function () {
-                    if (songQueue.songs.length >0) {
-                        console.log("Not gonna leave yet!")
-                    }
-                    else {
-                        console.log("Gotta dash!")
-                        songQueue.voice_channel.leave();
-                    }
-                }, 10000); */
                 queue.delete(guild.id);
                 songQueue.voice_channel.leave();
                 return;
@@ -42,6 +32,10 @@ module.exports = {
                 .setDescription(`[${song.title}](${song.url}) | ${message.author}`)
                 .setColor('#7508cf')
             message.channel.send(embed);
+        }
+        const find_video = async (query) => {
+            const videoResult = await ytSearch(query);
+            return (videoResult.videos.length > 1) ? videoResult.videos[0] : null;
         }
         //Checks if member is in a voice channel and if bot has perms to speak in channel
         const voiceChannel = message.member.voice.channel;
@@ -111,11 +105,16 @@ module.exports = {
             }
             songsInQ = await getVideos(url);
         }
+        else if (args[0].startsWith("https://open.spotify.com/track/"))
+        {
+
+        }
+        else if (args[0].startsWith("https://open.spotify.com/playlist/"))
+        {
+
+        }
         else{
-            const find_video = async (query) => {
-                const videoResult = await ytSearch(query);
-                return (videoResult.videos.length > 1) ? videoResult.videos[0] : null;
-            }
+
             const video = await find_video(args.join(' '));
             if (video) {
                 song = {
