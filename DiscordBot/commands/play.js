@@ -4,7 +4,10 @@ const ytSearch = require('yt-search');
 const message = require('../events/guild/message');
 const { indexOf } = require('ffmpeg-static');
 var { google } = require('googleapis');
+var SpotifyWebApi = require('spotify-web-api-node');
 var OAuth2 = google.auth.OAuth2;
+const { exec } = require('child_process');
+require('dotenv').config()
 module.exports = {
     name: 'play',
     description: 'Plays the song specified',
@@ -33,9 +36,23 @@ module.exports = {
                 .setColor('#7508cf')
             message.channel.send(embed);
         }
+        //Method to search up a yt video
         const find_video = async (query) => {
             const videoResult = await ytSearch(query);
             return (videoResult.videos.length > 1) ? videoResult.videos[0] : null;
+        }
+        const getSpotifyToken = async(login) =>
+        {
+            return new Promise(resolve=>
+                {               
+                    exec(`curl -X "POST" -H "Authorization: Basic ${login}" -d grant_type=client_credentials https://accounts.spotify.com/api/token`, (error, stdout, stderr) => {
+                    if (error) {
+                        console.error(`error: ${error.message}`);
+                        return message.channel.send("An error occured");
+                    }                          
+                    resolve(JSON.parse(stdout).access_token);
+            });  
+        })
         }
         //Checks if member is in a voice channel and if bot has perms to speak in channel
         const voiceChannel = message.member.voice.channel;
@@ -107,11 +124,61 @@ module.exports = {
         }
         else if (args[0].startsWith("https://open.spotify.com/track/"))
         {
-
+            var spotifyApi = new SpotifyWebApi({
+                clientId: process.env.SPOT_CLIENT_ID,
+                clientSecret: process.env.SPOT_CLIENT_SECRET,
+                redirectUri: 'http://www.example.com/callback'
+              });
+              var login = Buffer.from(process.env.SPOT_CLIENT_ID +":"+process.env.SPOT_CLIENT_SECRET).toString('base64');
+              spotifyApi.setAccessToken(await getSpotifyToken(login));
+              var trackID = args[0].substring(args[0].indexOf("k/")+"k/".length);
+              if(args[0].includes("?"))
+              {
+                trackID = args[0].substring(args[0].indexOf("k/")+"k/".length,args[0].indexOf("?"));
+              }
+              console.log(await spotifyApi.getTrack(trackID));
+        }
+        else if (args[0].startsWith("https://open.spotify.com/album/"))
+        {
+            var spotifyApi = new SpotifyWebApi({
+                clientId: process.env.SPOT_CLIENT_ID,
+                clientSecret: process.env.SPOT_CLIENT_SECRET,
+                redirectUri: 'http://www.example.com/callback'
+              });
+              var login = Buffer.from(process.env.SPOT_CLIENT_ID +":"+process.env.SPOT_CLIENT_SECRET).toString('base64');
+              spotifyApi.setAccessToken(await getSpotifyToken(login));
+              var albumID = args[0].substring(args[0].indexOf("m/")+"m/".length);
+            if(args[0].includes("?"))
+            {
+                albumID = args[0].substring(args[0].indexOf("m/")+"m/".length,args[0].indexOf("?"));
+            }
+            console.log(albumID);
         }
         else if (args[0].startsWith("https://open.spotify.com/playlist/"))
         {
-
+            var spotifyApi = new SpotifyWebApi({
+                clientId: process.env.SPOT_CLIENT_ID,
+                clientSecret: process.env.SPOT_CLIENT_SECRET,
+                redirectUri: 'http://www.example.com/callback'
+              });
+              var login = Buffer.from(process.env.SPOT_CLIENT_ID +":"+process.env.SPOT_CLIENT_SECRET).toString('base64');
+              spotifyApi.setAccessToken(await getSpotifyToken(login));
+              var listID = args[0].substring(args[0].indexOf("t/")+"t/".length);
+              if(args[0].includes("?"))
+              {
+                listID = args[0].substring(args[0].indexOf("t/")+"t/".length,args[0].indexOf("?"));
+              }
+              spotifyApi.getPlaylistTracks(listID).then(response=>{
+                    response.body.items.forEach(item=>
+                        {
+                            artists = "";
+                            item.track.artists.forEach(artist=>{
+                                artists += artist.name + " ";
+                            })
+                            artists.substring(0, artists.lastIndexOf(" "));
+                            console.log(item.track.name," - ",artists);
+                        })
+              })
         }
         else{
 
@@ -188,61 +255,3 @@ module.exports = {
         }
     }    
 }
-
-//OLD IMPLIMENTATION
-/*
-//This can be an async or normal function it doesn't matter from what I can tell
-async function checkYTURL(url) {
-    //This part matters, you must return a promise
-    return new Promise(resolve => {
-    fetch(url).then(async function (response) {
-        // Use the response from the API Call to get the text
-        return response.text();
-    }).then(async function (html) {
-        //parse the HTML doc using JSDOM
-        const dom = new jsdom.JSDOM(html);
-        //Find all the scripts in the doc and iterate through them
-        dom.window.document.querySelectorAll("script").forEach(thing => {
-            var script = thing.innerHTML;
-            //This method is dumb because it only contains the first 100 songs [Will rework with Youtube Data API]
-            if (script.indexOf("var ytInitialData =") > -1) {
-                //Take only the data within brackets of the var {all the bs inside}
-                //This puts it in JSON notation
-                var playlistScript = script.substring(script.indexOf("var ytInitialData = ") + "var ytInitialData = ".length, script.indexOf(";", script.indexOf("var ytInitialData =")))
-                //parse the string in JSON notation and now we have our data (after all that bs)
-                var parsedScript = JSON.parse(playlistScript)
-                //This data has a bunch of bs we don't need so we sift the all the bs
-                //You can log the parsedScript in the console to see the possible contents then log the contents and so on
-                //now iterate through that shit
-                console.log(parsedScript.contents);
-                parsedScript.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].itemSectionRenderer.contents[0].playlistVideoListRenderer.contents.forEach(object => {
-                    //Finally we get the song title and url after going through EVEN more contents of this giant data structure
-                    //put yt.com in front of url (because it is shortened) and you have your song
-                    if (object.playlistVideoRenderer) {
-                        var songTitle = object.playlistVideoRenderer.title.runs[0].text
-                        var urlFrag = object.playlistVideoRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url;
-                        var url = "https://www.youtube.com" + urlFrag.substring(0, urlFrag.indexOf("&list="));
-                        //Put it in the song kv pair object
-                        song = {
-                            title: songTitle,
-                            url: url,
-                        };
-                        //put that in the songs array and keep iterating
-                        songs.push(song)
-                    }
-                });
-                //Resolve songs here because this basically says THIS is the promise we wanna return :)
-                //console.log(songs);
-                resolve(songs);
-            }
-        });
-    }).catch(function (err) {
-        // There was an error
-        console.warn('Something went wrong.', err);
-        return [];
-    });
-   
-    })
-}
-//DO NOT CONTINUE DOING ANYTHING until checkYTURL is done (await for return)
-*/
