@@ -136,8 +136,22 @@ module.exports = {
               {
                 trackID = args[0].substring(args[0].indexOf("k/")+"k/".length,args[0].indexOf("?"));
               }
-              console.log(await spotifyApi.getTrack(trackID));
+            await spotifyApi.getTrack(trackID).then(async response => {
+                artists = "";
+                response.body.artists.forEach(artist => {
+                    artists += artist.name + " ";
+                })
+                artists.substring(0, artists.lastIndexOf(" "));
+                const video = await find_video(response.body.name, " - ", artists);
+                if (video) {
+                    song = {
+                        title: video.title,
+                        url: video.url,
+                    };
+                }
+            })
         }
+        /*
         else if (args[0].startsWith("https://open.spotify.com/album/"))
         {
             var spotifyApi = new SpotifyWebApi({
@@ -152,8 +166,8 @@ module.exports = {
             {
                 albumID = args[0].substring(args[0].indexOf("m/")+"m/".length,args[0].indexOf("?"));
             }
-            console.log(albumID);
-        }
+            return console.log(albumID);
+        }*/
         else if (args[0].startsWith("https://open.spotify.com/playlist/"))
         {
             var spotifyApi = new SpotifyWebApi({
@@ -167,18 +181,32 @@ module.exports = {
               if(args[0].includes("?"))
               {
                 listID = args[0].substring(args[0].indexOf("t/")+"t/".length,args[0].indexOf("?"));
-              }
-              spotifyApi.getPlaylistTracks(listID).then(response=>{
-                    response.body.items.forEach(item=>
-                        {
+            }
+            let songs = [];
+            function fillSongs() {
+                return new Promise(resolve => {
+                    spotifyApi.getPlaylistTracks(listID).then(async response => {
+                        var index = 0;
+                        response.body.items.forEach(async item => {
                             artists = "";
-                            item.track.artists.forEach(artist=>{
+                            item.track.artists.forEach(artist => {
                                 artists += artist.name + " ";
                             })
                             artists.substring(0, artists.lastIndexOf(" "));
-                            console.log(item.track.name," - ",artists);
+                            const video = await find_video(item.track.name, " - ", artists);
+                            if (video) {
+                                song = {
+                                    title: video.title,
+                                    url: video.url,
+                                };
+                            }
+                            songs.push(song);
+                            if (index === response.body.items.length) { resolve(songs) }
                         })
-              })
+                    })
+                })             
+            }
+            songsInQ = await fillSongs();
         }
         else{
 
