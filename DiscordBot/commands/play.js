@@ -201,6 +201,8 @@ module.exports = {
                                 };
                             }
                             songs.push(song);
+                            index++;
+                            console.log(song);
                             if (index === response.body.items.length) { resolve(songs) }
                         })
                     })
