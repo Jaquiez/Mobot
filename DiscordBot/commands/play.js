@@ -41,6 +41,8 @@ module.exports = {
             const videoResult = await ytSearch(query);
             return (videoResult.videos.length > 1) ? videoResult.videos[0] : null;
         }
+        //Gets spotify token by execute shell command
+        // Command uses login (id + secret) to be granted an api token, returns api token from JSON provided
         const getSpotifyToken = async(login) =>
         {
             return new Promise(resolve=>
