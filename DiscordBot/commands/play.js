@@ -1,12 +1,9 @@
 const ytdl = require('ytdl-core');
-const { execute } = require('./clean');
-const ytSearch = require('yt-search');
-const message = require('../events/guild/message');
-const { indexOf } = require('ffmpeg-static');
 var { google } = require('googleapis');
 var SpotifyWebApi = require('spotify-web-api-node');
-var OAuth2 = google.auth.OAuth2;
 const { exec } = require('child_process');
+const fetch = require("node-fetch");
+const jsdom = require("jsdom");
 require('dotenv').config()
 module.exports = {
     name: 'play',
@@ -37,9 +34,36 @@ module.exports = {
             message.channel.send(embed);
         }
         //Method to search up a yt video
-        const find_video = async (query) => {
-            const videoResult = await ytSearch(query);
-            return (videoResult.videos.length > 1) ? videoResult.videos[0] : null;
+        const find_video = (query) => {
+            return new Promise(resolve => {
+                fetch(encodeURI("https://www.youtube.com/results?search_query=" + query)).then(async function (response) {
+                    return response.text();
+                }).then(async function (html) {
+                    const dom = new jsdom.JSDOM(html);
+                    dom.window.document.querySelectorAll("script").forEach(thing => {
+                        var script = thing.innerHTML;
+                        if (script.indexOf("var ytInitialData =") > -1) {
+                            var searchScript = script.substring(script.indexOf("var ytInitialData = ") + "var ytInitialData = ".length, script.indexOf(";", script.indexOf("var ytInitialData =")))
+                            var parsedScript = JSON.parse(searchScript)
+                            parsedScript.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents.forEach(item =>
+                            {
+                                if (item.videoRenderer) {
+                                    song = {
+                                        title: item.videoRenderer.title.runs[0].text,
+                                        url: "https://www.youtube.com/watch?v=" + item.videoRenderer.videoId
+                                    }
+                                    resolve(song);
+                                }
+                            })
+                            resolve(null);
+                        }
+                    });
+                }).catch(function (err) {
+                    console.warn('Something went wrong.', err);
+                    console.log(encodeURI("https://www.youtube.com/results?search_query=" + query));
+                    resolve(null);
+                });
+            })
         }
         //Gets spotify token by execute shell command
         // Command uses login (id + secret) to be granted an api token, returns api token from JSON provided
@@ -188,24 +212,19 @@ module.exports = {
             function fillSongs() {
                 return new Promise(resolve => {
                     spotifyApi.getPlaylistTracks(listID).then(async response => {
-                        var index = 0;
+                        var index = 0;                        
                         response.body.items.forEach(async item => {
-                            artists = "";
-                            item.track.artists.forEach(artist => {
-                                artists += artist.name + " ";
-                            })
-                            artists.substring(0, artists.lastIndexOf(" "));
-                            const video = await find_video(item.track.name, " - ", artists);
-                            if (video) {
-                                song = {
-                                    title: video.title,
-                                    url: video.url,
-                                };
+                            //This api call cannot be called too fast so a timeout is needed (free developer limit)
+                            const song = await find_video(item.track.name + "-" + item.track.artists[0].name);
+                            if (song !== null) {
+                                songs.push(song);
                             }
-                            songs.push(song);
                             index++;
                             console.log(song);
-                            if (index === response.body.items.length) { resolve(songs) }
+                            if (index === response.body.items.length)
+                            {
+                                resolve(songs)
+                            }
                         })
                     })
                 })             
@@ -213,7 +232,6 @@ module.exports = {
             songsInQ = await fillSongs();
         }
         else{
-
             const video = await find_video(args.join(' '));
             if (video) {
                 song = {
@@ -222,6 +240,7 @@ module.exports = {
                 };
             }
             else {
+                console.log("error");
                 return message.channel.send("Could not find a video on: " + args.join(' '));
             }
         }
