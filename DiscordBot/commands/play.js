@@ -52,10 +52,10 @@ module.exports = {
                             return resolve(song);
                         }
                     })
-                    resolve(null);
+                    return resolve(null);
                 }).catch(function (err) {                   
                     console.log(encodeURI("https://www.youtube.com/results?search_query=" + query));
-                    reject("Something went wrong :", err);
+                    reject("Something went wrong -> ", err);
                 });
             })
         }
@@ -102,8 +102,6 @@ module.exports = {
         //Checking if the arguments contains a youtube playlist
         else if (args[0].startsWith("https://www.youtube.com/playlist?list=") || args[0].startsWith("https://youtube.com/playlist?list="))
         {
-            let songs = [];
-            const url = args[0];
             function getVideos(url, nextToken) {
                 var service = google.youtube('v3');
                 return new Promise(resolve => {
@@ -140,6 +138,8 @@ module.exports = {
                     })
                 });
             }
+            let songs = [];
+            const url = args[0];
             songsInQ = await getVideos(url);
         }
         else if (args[0].startsWith("https://open.spotify.com/track/"))
@@ -185,19 +185,19 @@ module.exports = {
             {
                 albumID = args[0].substring(args[0].indexOf("album/")+"album/".length,args[0].indexOf("?"));
             }
-            let songs = [];          
+                 
             function getSongs(albumID) {
                 return new Promise(resolve => {
                     spotifyApi.getAlbumTracks(albumID).then(async response => {
                         var index = 0;
-
-                        response.body.items.forEach(async item => {
+                        let songs = []
+                        response.body.items.forEach(async (item,i) => {
                             const song = await find_video(item.name + "-" + item.artists[0].name);
+                            //Makes sure songs are in order, splice by index
                             if (song !== null) {
-                                songs.push(song);
+                                songs.splice(i, 0, song);
                             }
                             index++;
-                            console.log(song);
                             if (index === response.body.items.length) {
                                 resolve(songs);
                             }
@@ -226,10 +226,10 @@ module.exports = {
                 return new Promise(resolve => {
                     spotifyApi.getPlaylistTracks(listID).then(async response => {
                         var index = 0;                        
-                        response.body.items.forEach(async item => {
+                        response.body.items.forEach(async (item,i) => {
                             const song = await find_video(item.track.name + "-" + item.track.artists[0].name);
                             if (song !== null) {
-                                songs.push(song);
+                                songs.splice(i, 0, song);
                             }
                             index++;
                             console.log(song);
