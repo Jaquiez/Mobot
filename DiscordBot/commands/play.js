@@ -33,18 +33,19 @@ module.exports = {
                 .setColor('#7508cf')
             message.channel.send(embed);
         }
-        //Method to search up a yt video
+        //Search up yt video by parsing search query html doc
+        //Fails sometimes with -> "SyntaxError: Unexpected end of JSON input" (no idea why, need to figure out)
         const find_video = (query) => {
             return new Promise(resolve => {
                 fetch(encodeURI("https://www.youtube.com/results?search_query=" + query)).then(async function (response) {
-                    return response.text();
+                    return response.text();           
                 }).then(async function (html) {
                     const dom = new jsdom.JSDOM(html);
                     dom.window.document.querySelectorAll("script").forEach(thing => {
                         var script = thing.innerHTML;
-                        if (script.indexOf("var ytInitialData =") > -1) {
-                            var searchScript = script.substring(script.indexOf("var ytInitialData = ") + "var ytInitialData = ".length, script.indexOf(";", script.indexOf("var ytInitialData =")))
-                            var parsedScript = JSON.parse(searchScript)
+                        if (script.indexOf("var ytInitialData =") > -1) {                          
+                            var searchScript = script.substring(script.indexOf("var ytInitialData = ") + "var ytInitialData = ".length, script.indexOf(";", script.indexOf("var ytInitialData =")));
+                            var parsedScript = JSON.parse(searchScript);
                             parsedScript.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents.forEach(item =>
                             {
                                 if (item.videoRenderer) {
@@ -177,7 +178,6 @@ module.exports = {
                 }
             })
         }
-        /*
         else if (args[0].startsWith("https://open.spotify.com/album/"))
         {
             var spotifyApi = new SpotifyWebApi({
@@ -185,15 +185,35 @@ module.exports = {
                 clientSecret: process.env.SPOT_CLIENT_SECRET,
                 redirectUri: 'http://www.example.com/callback'
               });
-              var login = Buffer.from(process.env.SPOT_CLIENT_ID +":"+process.env.SPOT_CLIENT_SECRET).toString('base64');
-              spotifyApi.setAccessToken(await getSpotifyToken(login));
-              var albumID = args[0].substring(args[0].indexOf("m/")+"m/".length);
+            var login = Buffer.from(process.env.SPOT_CLIENT_ID +":"+process.env.SPOT_CLIENT_SECRET).toString('base64');
+            spotifyApi.setAccessToken(await getSpotifyToken(login));
+            var albumID = args[0].substring(args[0].indexOf("album/")+"album/".length);
             if(args[0].includes("?"))
             {
-                albumID = args[0].substring(args[0].indexOf("m/")+"m/".length,args[0].indexOf("?"));
+                albumID = args[0].substring(args[0].indexOf("album/")+"album/".length,args[0].indexOf("?"));
             }
-            return console.log(albumID);
-        }*/
+            let songs = [];          
+            function getSongs(albumID) {
+                return new Promise(resolve => {
+                    spotifyApi.getAlbumTracks(albumID).then(async response => {
+                        var index = 0;
+
+                        response.body.items.forEach(async item => {
+                            const song = await find_video(item.name + "-" + item.artists[0].name);
+                            if (song !== null) {
+                                songs.push(song);
+                            }
+                            index++;
+                            console.log(song);
+                            if (index === response.body.items.length) {
+                                resolve(songs);
+                            }
+                        })                        
+                    })
+                })
+            }
+            songsInQ = await getSongs(albumID);
+        }
         else if (args[0].startsWith("https://open.spotify.com/playlist/"))
         {
             var spotifyApi = new SpotifyWebApi({
@@ -214,7 +234,6 @@ module.exports = {
                     spotifyApi.getPlaylistTracks(listID).then(async response => {
                         var index = 0;                        
                         response.body.items.forEach(async item => {
-                            //This api call cannot be called too fast so a timeout is needed (free developer limit)
                             const song = await find_video(item.track.name + "-" + item.track.artists[0].name);
                             if (song !== null) {
                                 songs.push(song);
