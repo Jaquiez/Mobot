@@ -2,7 +2,7 @@
 
 A free to use discord bot that you can [add to your server for free](https://discord.com/oauth2/authorize?client_id=800188621230833735&permissions=8&scope=bot)
 
-#Features
+**Features**
 * Play youtube and spotify music in voice channel! (Soundcloud in development)
 * Nuke text channels
 * Clear messages from a text channel
