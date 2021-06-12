@@ -12,7 +12,6 @@ module.exports = {
             message.channel.send(embed);
             serverQueue.songs = [];
             if (serverQueue.connection.dispatcher !== null) {
-
                 serverQueue.connection.dispatcher.end();
             }
             else {

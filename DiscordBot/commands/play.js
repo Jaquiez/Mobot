@@ -26,13 +26,19 @@ module.exports = {
                 .setTitle(`Now playing: ${song.title}`)
                 .setDescription(`[${song.title}](${song.url}) | ${message.author}`)
                 .setColor('#7508cf')
-            message.channel.send(embed).then(msg=>
+            message.channel.send(embed).then(async msg=>
             {
+                await ytdl.getInfo(song.url).catch(err => {
+                    console.log(err);
+                    songQueue.songs.shift();
+                    video_player(guild, songQueue.songs[0]);
+                    msg.delete();
+                })
                 const stream = ytdl(song.url, { filter: 'audioonly' });
                 songQueue.connection.play(stream, { seak: 0, volume: .5 })
                     .on('finish', () => {
                         songQueue.songs.shift();
-                        video_player(guild, songQueue.songs[0])
+                        video_player(guild, songQueue.songs[0]);
                         msg.delete();
                     });
             })

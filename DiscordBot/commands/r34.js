@@ -7,6 +7,9 @@ module.exports = {
     permissions: [],
 
     async execute(client, message, args, Discord) {
+        if (!message.channel.nsfw) {
+            return message.channel.send("This is only allowed in an NSFW channel");
+        }
         var balls = "";
         for (var word of args) {
             balls += word;
