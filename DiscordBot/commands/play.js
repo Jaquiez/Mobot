@@ -22,17 +22,21 @@ module.exports = {
                 songQueue.voice_channel.leave();
                 return;
             }
-            const stream = ytdl(song.url, { filter: 'audioonly' });
-            songQueue.connection.play(stream, { seak: 0, volume: .5 })
-                .on('finish', () => {
-                    songQueue.songs.shift();
-                    video_player(guild, songQueue.songs[0])
-                });
             const embed = new Discord.MessageEmbed()
                 .setTitle(`Now playing: ${song.title}`)
                 .setDescription(`[${song.title}](${song.url}) | ${message.author}`)
                 .setColor('#7508cf')
-            message.channel.send(embed);
+            message.channel.send(embed).then(msg=>
+            {
+                const stream = ytdl(song.url, { filter: 'audioonly' });
+                songQueue.connection.play(stream, { seak: 0, volume: .5 })
+                    .on('finish', () => {
+                        songQueue.songs.shift();
+                        video_player(guild, songQueue.songs[0])
+                        msg.delete();
+                    });
+            })
+
         }
         //Finds video by getting html page of search query
         //JSDOM is slow so string manipulation works better :)
@@ -232,7 +236,6 @@ module.exports = {
                                 songs.splice(i, 0, song);
                             }
                             index++;
-                            console.log(song);
                             if (index === response.body.items.length)
                             {
                                 resolve(songs)

@@ -10,20 +10,12 @@ module.exports = {
         if (serverQueue !== undefined) {    
             if (serverQueue.songs.length > 10) {
                 for (k = 0; k < 10; k++) {
-                    ting += (k + 1) + ".) ";
-                    for (var kay in serverQueue.songs[k]) {
-                        ting += serverQueue.songs[k][kay] + " | ";
-                    }
-                    ting += "\n";
+                    ting += (parseInt(k) + 1) + ".) " + `[${serverQueue.songs[k].title}](${serverQueue.songs[k].url})` + "\n";
                 }
             }
             else {
                 for (var key in serverQueue.songs) {
-                    ting += (parseInt(key) + 1) + ".) ";
-                    for (var kay in serverQueue.songs[key]) {
-                        ting += serverQueue.songs[key][kay] + " | ";
-                    }
-                    ting += "\n";
+                    ting += (parseInt(key) + 1) + ".) " + `[${serverQueue.songs[key].title}](${serverQueue.songs[key].url})` + "\n";
                 }
             }
             //work around for now, rework to make pages that only display 8-10 songs at a time
