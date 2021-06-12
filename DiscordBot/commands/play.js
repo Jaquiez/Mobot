@@ -4,6 +4,7 @@ var SpotifyWebApi = require('spotify-web-api-node');
 const { exec } = require('child_process');
 const fetch = require("node-fetch");
 const jsdom = require("jsdom");
+const { script } = require('googleapis/build/src/apis/script');
 require('dotenv').config()
 module.exports = {
     name: 'play',
@@ -33,36 +34,26 @@ module.exports = {
                 .setColor('#7508cf')
             message.channel.send(embed);
         }
-        //Search up yt video by parsing search query html doc
-        //Fails sometimes with -> "SyntaxError: Unexpected end of JSON input" (no idea why, need to figure out)
+        //Finds video by getting html page of search query
+        //JSDOM is slow so string manipulation works better :)
         const find_video = (query) => {
             return new Promise((resolve,reject) => {
                 fetch(encodeURI("https://www.youtube.com/results?search_query=" + query)).then(async function (response) {
                     return response.text();           
                 }).then(async function (html) {
-                    const dom = new jsdom.JSDOM(html);
-                    dom.window.document.querySelectorAll("script").forEach(thing => {
-                        var script = thing.innerHTML;
-                        if (script.indexOf("var ytInitialData =") > -1) {                          
-                            var searchScript = script.substring(script.indexOf("var ytInitialData = ") + "var ytInitialData = ".length, 1+script.indexOf("};", script.indexOf("var ytInitialData =")));
-                            var parsedScript = JSON.parse(searchScript);
-                            parsedScript.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents.forEach(item =>
-                            {
-                                if (item.videoRenderer) {
-                                    song = {
-                                        title: item.videoRenderer.title.runs[0].text,
-                                        url: "https://www.youtube.com/watch?v=" + item.videoRenderer.videoId
-                                    }
-                                    resolve(song);
-                                }
-                            })
-                            resolve(null);
+                    var parsedScript = html.substring(html.indexOf("var ytInitialData = ")+"var ytInitialData = ".length,1+html.indexOf("};", html.indexOf("var ytInitialData =")))
+                    parsedScript = JSON.parse(parsedScript);
+                    parsedScript.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents.forEach(item => {
+                        if (item.videoRenderer) {
+                            song = {
+                                title: item.videoRenderer.title.runs[0].text,
+                                url: "https://www.youtube.com/watch?v=" + item.videoRenderer.videoId
+                            }
+                            return resolve(song);
                         }
                     })
-                }).catch(function (err) {
-                    /*
-                    console.warn('Something went wrong.', err);
-                    console.log(dom);*/
+                    resolve(null);
+                }).catch(function (err) {                   
                     console.log(encodeURI("https://www.youtube.com/results?search_query=" + query));
                     reject("Something went wrong :", err);
                 });
