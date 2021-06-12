@@ -36,7 +36,7 @@ module.exports = {
         //Search up yt video by parsing search query html doc
         //Fails sometimes with -> "SyntaxError: Unexpected end of JSON input" (no idea why, need to figure out)
         const find_video = (query) => {
-            return new Promise(resolve => {
+            return new Promise((resolve,reject) => {
                 fetch(encodeURI("https://www.youtube.com/results?search_query=" + query)).then(async function (response) {
                     return response.text();           
                 }).then(async function (html) {
@@ -44,7 +44,7 @@ module.exports = {
                     dom.window.document.querySelectorAll("script").forEach(thing => {
                         var script = thing.innerHTML;
                         if (script.indexOf("var ytInitialData =") > -1) {                          
-                            var searchScript = script.substring(script.indexOf("var ytInitialData = ") + "var ytInitialData = ".length, script.indexOf(";", script.indexOf("var ytInitialData =")));
+                            var searchScript = script.substring(script.indexOf("var ytInitialData = ") + "var ytInitialData = ".length, 1+script.indexOf("};", script.indexOf("var ytInitialData =")));
                             var parsedScript = JSON.parse(searchScript);
                             parsedScript.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents.forEach(item =>
                             {
@@ -58,11 +58,13 @@ module.exports = {
                             })
                             resolve(null);
                         }
-                    });
+                    })
                 }).catch(function (err) {
+                    /*
                     console.warn('Something went wrong.', err);
+                    console.log(dom);*/
                     console.log(encodeURI("https://www.youtube.com/results?search_query=" + query));
-                    resolve(null);
+                    reject("Something went wrong :", err);
                 });
             })
         }
