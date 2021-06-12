@@ -17,7 +17,9 @@ module.exports = {
             if (numberOfMessagesToDelete > 1 && numberOfMessagesToDelete<101)
             {
                 message.channel.bulkDelete(numberOfMessagesToDelete, true);
-                message.channel.send('CLEARED ' + (numberOfMessagesToDelete - 1) + ' MESSAGE(S)!');
+                message.channel.send('CLEARED ' + (numberOfMessagesToDelete - 1) + ' MESSAGE(S)!').then(msg => {
+                    setTimeout(function () {msg.delete();}, 3000);
+                });
                 //message.channel.bulkDelete(1);
             }
             else

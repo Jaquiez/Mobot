@@ -2,7 +2,7 @@
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    <Name>OgreBot</Name>
+    <Name>Mobot</Name>
     <RootNamespace>DiscordBot</RootNamespace>
     <Environment>
     </Environment>
@@ -91,7 +91,6 @@
     <Content Include="quickstart.js">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="commands\" />

@@ -8,9 +8,9 @@ module.exports = {
         const target = message.mentions.users.first();
         if (target) {
 
-            //let mainRole = message.guild.roles.cache.find(role => role.name === 'Infidel');
+            //let mainRole =
             
-            //let muteRole = message.guild.roles.cache.find(role => role.name === 'mute');
+            //let muteRole = 
             //let muteRole = message.guild.roles.cache.find(role => guild.roles.permissions.cache.find("SEND_MESSAGES") !== true);
             let memberTarget = message.guild.members.cache.get(target.id);            
             //memberTarget.roles.add(muteRole.id);
