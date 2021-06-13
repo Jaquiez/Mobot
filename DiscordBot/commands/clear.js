@@ -15,7 +15,7 @@ module.exports = {
                 serverQueue.connection.dispatcher.end();
             }
             else {
-                message.channel.send("You disconnected me from the channel, so I deleted your queue. Please just use \".clear\" to disconnect me.")
+                message.channel.send("An error occured");
                 queue.delete(message.guild.id);
             }
         }

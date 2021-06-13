@@ -15,8 +15,7 @@ module.exports = {
         }
         catch (err) {
             console.error("SKIP ERROR OCCURED \n", err);
-            message.channel.send("You disconnected me from the channel, so I deleted your queue. Please just use \".clear\" to disconnect me.")
-            queue.delete(message.guild.id);
+            message.channel.send("An error occured");
         }
 
     }

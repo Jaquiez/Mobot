@@ -28,12 +28,14 @@ module.exports = {
                 .setColor('#7508cf')
             message.channel.send(embed).then(async msg=>
             {
+                var finished = false;
                 const stream = ytdl(song.url, { filter: 'audioonly' });
                 songQueue.connection.play(stream, { seak: 0, volume: .5 })
                     .on('finish', () => {
                         songQueue.songs.shift();
-                        video_player(guild, songQueue.songs[0]);
                         msg.delete();
+                        video_player(guild, songQueue.songs[0]);
+                        finished = true;
                     })
                     .on('error', () =>{
                         songQueue.songs.shift();
@@ -41,8 +43,16 @@ module.exports = {
                         msg.edit(embed);
                         setTimeout(()=>{
                             video_player(guild, songQueue.songs[0]);
-                            msg.delete()
+                            return msg.delete()
                         },3000); 
+                    })
+                    .on('close', ()=>{
+                        if(!finished)
+                        {
+                            msg.delete();
+                            queue.delete(guild.id);
+                            return message.channel.send("I've been disconnected! (So I deleted the queue)");
+                        }           
                     });
             })
 
@@ -205,7 +215,7 @@ module.exports = {
                         var index = 0;
                         let songs = []
                         response.body.items.forEach(async (item,i) => {
-                            const song = await find_video(item.name + "-" + item.artists[0].name);
+                            const song = await find_video(item.artists[0].name + "-" + item.name );
                             //Makes sure songs are in order, splice by index
                             if (song !== null) {
                                 songs.splice(i, 0, song);
@@ -234,18 +244,22 @@ module.exports = {
               {
                 listID = args[0].substring(args[0].indexOf("t/")+"t/".length,args[0].indexOf("?"));
             }
-            let songs = [];
             function fillSongs() {
                 return new Promise(resolve => {
                     spotifyApi.getPlaylistTracks(listID).then(async response => {
-                        var index = 0;                        
-                        response.body.items.forEach(async (item,i) => {
-                            const song = await find_video(item.track.name + "-" + item.track.artists[0].name);
+                        let songs = new Array(response.body.items.length);
+                        var i = 0;                   
+                        response.body.items.forEach(async (item,index) => {
+                            const song = await find_video(item.track.artists[0].name + "-" + item.track.name);
                             if (song !== null) {
-                                songs.splice(i, 0, song);
+                                songs.splice(index, 1, song);
                             }
-                            index++;
-                            if (index === response.body.items.length)
+                            else
+                            {
+                                songs.delete(index);
+                            }
+                            i++;
+                            if (i === response.body.items.length)
                             {
                                 resolve(songs)
                             }
