@@ -28,18 +28,21 @@ module.exports = {
                 .setColor('#7508cf')
             message.channel.send(embed).then(async msg=>
             {
-                await ytdl.getInfo(song.url).catch(err => {
-                    console.log(err);
-                    songQueue.songs.shift();
-                    video_player(guild, songQueue.songs[0]);
-                    msg.delete();
-                })
                 const stream = ytdl(song.url, { filter: 'audioonly' });
                 songQueue.connection.play(stream, { seak: 0, volume: .5 })
                     .on('finish', () => {
                         songQueue.songs.shift();
                         video_player(guild, songQueue.songs[0]);
                         msg.delete();
+                    })
+                    .on('error', () =>{
+                        songQueue.songs.shift();
+                        embed.setTitle(`An error occured when playing -> ${song.title}`)
+                        msg.edit(embed);
+                        setTimeout(()=>{
+                            video_player(guild, songQueue.songs[0]);
+                            msg.delete()
+                        },3000); 
                     });
             })
 
