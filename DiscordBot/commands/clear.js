@@ -13,6 +13,7 @@ module.exports = {
             serverQueue.songs = [];
             if (serverQueue.connection.dispatcher !== null) {
                 serverQueue.connection.dispatcher.end();
+                //queue.delete(message.guild.id);
             }
             else {
                 message.channel.send("An error occured");

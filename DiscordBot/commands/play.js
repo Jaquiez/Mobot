@@ -30,7 +30,7 @@ module.exports = {
             {
                 var finished = false;
                 const stream = ytdl(song.url, { filter: 'audioonly' });
-                songQueue.connection.play(stream, { seak: 0, volume: .5 })
+                songQueue.connection.play(stream, { seak: 0, volume: 1 })
                     .on('finish', () => {
                         songQueue.songs.shift();
                         msg.delete();
