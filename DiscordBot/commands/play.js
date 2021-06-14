@@ -33,6 +33,7 @@ module.exports = {
             message.channel.send(embed).then(async msg=>
             {
                 var finished = false;
+                var error = false
                 const stream = ytdl(song.url, { filter: 'audioonly' });
                 songQueue.connection.play(stream, { seak: 0, volume: 1 })
                     .on('finish', () => {
@@ -42,6 +43,7 @@ module.exports = {
                         finished = true;
                     })
                     .on('error', () =>{
+                        error = true;
                         songQueue.songs.shift();
                         embed.setTitle(`An error occured when playing -> ${song.title}`)
                         msg.edit(embed);
@@ -51,7 +53,7 @@ module.exports = {
                         },3000); 
                     })
                     .on('close', ()=>{
-                        if(!finished)
+                        if(!finished && !error)
                         {
                             msg.delete();
                             queue.delete(guild.id);
