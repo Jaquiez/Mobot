@@ -19,7 +19,11 @@ module.exports = {
             }
             if (!song) {
                 queue.delete(guild.id);
-                songQueue.voice_channel.leave();
+                await setTimeout(() => {
+                    if (queue.get(guild.id) === undefined){
+                        songQueue.voice_channel.leave();
+                    }
+                }, 300000);
                 return;
             }
             const embed = new Discord.MessageEmbed()
