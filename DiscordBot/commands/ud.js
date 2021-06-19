@@ -3,7 +3,7 @@ const fetch = require("node-fetch");
 const jsdom = require("jsdom");
 module.exports = {
     name: 'ud',
-    description: 'Gets the urban dictionary definition of a word/term, and the first google image result of that word/term',
+    description: 'Gets the urban dictionary definition of a word/term',
     permissions: [],
 
     async execute(client, message, args, Discord) {

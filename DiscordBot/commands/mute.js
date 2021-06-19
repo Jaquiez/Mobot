@@ -1,6 +1,6 @@
 module.exports = {
     name: 'mute',
-    description: 'Mutes a member',
+    description: 'Mutes a member [NOT WORKING]',
     permissions: ["MUTE_MEMBERS"],
 
     // Mutes a member by removing their 
