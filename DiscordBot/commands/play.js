@@ -63,8 +63,7 @@ module.exports = {
             })
 
         }
-        //Finds video by getting html page of search query
-        //JSDOM is slow so string manipulation works better :)
+        //Finds video by getting html page of a search query
         const find_video = (query) => {
             return new Promise((resolve,reject) => {
                 fetch(encodeURI("https://www.youtube.com/results?search_query=" + query)).then(async function (response) {
@@ -72,6 +71,8 @@ module.exports = {
                 }).then(async function (html) {
                     var parsedScript = html.substring(html.indexOf("var ytInitialData = ")+"var ytInitialData = ".length,1+html.indexOf("};", html.indexOf("var ytInitialData =")))
                     parsedScript = JSON.parse(parsedScript);
+                    var ting;
+                    //Can't resolve my promise inside this foreach???? I'm going to look into it but this gives a better result for some reason....
                     parsedScript.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents.every(item => {
                         if (item.videoRenderer) {
                             song = {
@@ -80,14 +81,13 @@ module.exports = {
                                 length: item.videoRenderer.lengthText.simpleText,
                                 requester: message.author
                             }
-                            console.log(song);
-                            resolve(song);
+                            return resolve(song);
                             return false;
                         }
                     })
-                    resolve(null);
+                    reject("An error occured when parsing I think -> " + parsedScript.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents[0]);
                 }).catch(function (err) {                   
-                    console.log(encodeURI("https://www.youtube.com/results?search_query=" + query));
+                    console.error(encodeURI("https://www.youtube.com/results?search_query=" + query));
                     reject("Something went wrong -> ", err);
                 });
             })
@@ -226,14 +226,13 @@ module.exports = {
                         var index = 0;
                         let songs = new Array(response.body.items.length);
                         response.body.items.forEach(async (item,i) => {
-                            const song = await find_video(item.artists[0].name + "-" + item.name );
+                            const song = await find_video(item.artists[0].name + "-" + item.name).catch((err) => {
+                                console.error(err);
+                                //songs.splice(i, 1);
+                            })
+                            console.log(item.name);
                             //Makes sure songs are in order, splice by index
-                            if (song !== null) {
-                                songs.splice(i, 1, song);
-                            }
-                            else {
-                                songs.splice(i,1);
-                            }
+                            songs.splice(i, 1, song);
                             index++;
                             if (index === response.body.items.length) {
                                 resolve(songs);
@@ -264,13 +263,14 @@ module.exports = {
                         let songs = new Array(response.body.items.length);
                         var i = 0;     
                         response.body.items.forEach(async (item,index) => {
-                            const song = await find_video(item.track.artists[0].name + "-" + item.track.name);
+                            const song = await find_video(item.track.artists[0].name + " - " + item.track.name);
                             if (song !== null) {
                                 songs.splice(index, 1, song);
                             }
                             else
                             {
-                                //songs.splice(index,1);
+                                console.log(`Couldn't play -> ${item.track.name}`);
+                                //console.log(song);
                             }
                             i++;
                             if (i === response.body.items.length)
