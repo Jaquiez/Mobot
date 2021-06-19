@@ -72,13 +72,14 @@ module.exports = {
                 }).then(async function (html) {
                     var parsedScript = html.substring(html.indexOf("var ytInitialData = ")+"var ytInitialData = ".length,1+html.indexOf("};", html.indexOf("var ytInitialData =")))
                     parsedScript = JSON.parse(parsedScript);
-                    parsedScript.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents.forEach(item => {
+                    parsedScript.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents.every(item => {
                         if (item.videoRenderer) {
                             song = {
                                 title: item.videoRenderer.title.runs[0].text,
                                 url: "https://www.youtube.com/watch?v=" + item.videoRenderer.videoId
                             }
-                            return resolve(song);
+                            resolve(song);
+                            return false;
                         }
                     })
                     return resolve(null);
@@ -254,7 +255,8 @@ module.exports = {
                 return new Promise(resolve => {
                     spotifyApi.getPlaylistTracks(listID).then(async response => {
                         let songs = new Array(response.body.items.length);
-                        var i = 0;                   
+                        var i = 0;     
+                        console.log(response.body.items.length);             
                         response.body.items.forEach(async (item,index) => {
                             const song = await find_video(item.track.artists[0].name + "-" + item.track.name);
                             if (song !== null) {
@@ -262,12 +264,12 @@ module.exports = {
                             }
                             else
                             {
-                                songs.delete(index);
+                                songs.splice(index,1);
                             }
                             i++;
                             if (i === response.body.items.length)
                             {
-                                resolve(songs)
+                                //songs
                             }
                         })
                     })
@@ -302,7 +304,7 @@ module.exports = {
                         queueConstructor.songs.push(song)
                     });
                     const embed = new Discord.MessageEmbed()
-                    .setTitle(`${songsInQ.length} songs have been added to the queue!`)
+                    .setTitle(`${queueConstructor.songs.length} songs have been added to the queue!`)
                     .setColor('#7508cf')
                     message.channel.send(embed);
                 }

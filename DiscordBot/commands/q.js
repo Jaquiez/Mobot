@@ -7,6 +7,7 @@ module.exports = {
     async execute(client, message, args, Discord, queue) {
         const serverQueue = await queue.get(message.guild.id);
         var ting = "";
+        var lastPage = serverQueue.songs.length/10;
         const setQMessage = (pageNumber)=>{
             var q = "";
             var len = pageNumber*10;
@@ -46,7 +47,7 @@ module.exports = {
                         msg.edit(embed);
                         msg.reactions.removeAll();
                     }
-                    else if(reaction._emoji.name === '➡️')
+                    else if(reaction._emoji.name === '➡️' && pageNumber<lastPage)
                     {
                         pageNumber++;
                         embed.setDescription(setQMessage(pageNumber));
