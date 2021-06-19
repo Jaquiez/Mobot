@@ -80,11 +80,12 @@ module.exports = {
                                 length: item.videoRenderer.lengthText.simpleText,
                                 requester: message.author
                             }
+                            console.log(song);
                             resolve(song);
                             return false;
                         }
                     })
-                    return resolve(null);
+                    resolve(null);
                 }).catch(function (err) {                   
                     console.log(encodeURI("https://www.youtube.com/results?search_query=" + query));
                     reject("Something went wrong -> ", err);
@@ -231,7 +232,7 @@ module.exports = {
                                 songs.splice(i, 1, song);
                             }
                             else {
-                                songs.delete(i);
+                                songs.splice(i,1);
                             }
                             index++;
                             if (index === response.body.items.length) {
@@ -257,12 +258,11 @@ module.exports = {
               {
                 listID = args[0].substring(args[0].indexOf("t/")+"t/".length,args[0].indexOf("?"));
             }
-            function fillSongs() {
+            function fillSongs(nextPage) {
                 return new Promise(resolve => {
-                    spotifyApi.getPlaylistTracks(listID).then(async response => {
+                    spotifyApi.getPlaylistTracks(listID, {offset: nextPage}).then(async response => {
                         let songs = new Array(response.body.items.length);
                         var i = 0;     
-                        console.log(response.body.items.length);             
                         response.body.items.forEach(async (item,index) => {
                             const song = await find_video(item.track.artists[0].name + "-" + item.track.name);
                             if (song !== null) {
@@ -270,12 +270,21 @@ module.exports = {
                             }
                             else
                             {
-                                songs.splice(index,1);
+                                //songs.splice(index,1);
                             }
                             i++;
                             if (i === response.body.items.length)
                             {
-                                //songs
+                                if(response.body.next)
+                                {
+                                    var nextCall = response.body.next;
+                                    songs = songs.concat(await fillSongs(parseInt(nextCall.substring(nextCall.indexOf("offset=")+"offset=".length,nextCall.indexOf("&limit")))));
+                                    resolve(songs);
+                                }
+                                else
+                                {
+                                    resolve(songs);
+                                }
                             }
                         })
                     })
