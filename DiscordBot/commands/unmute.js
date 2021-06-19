@@ -1,6 +1,6 @@
 module.exports = {
     name: 'unmute',
-    description: 'Unmutes a member',
+    description: 'Unmutes a member [NOT WORKING]',
     permissions: ["MUTE_MEMBERS"],
 
     // Unmutes a member by removing the "mute" role

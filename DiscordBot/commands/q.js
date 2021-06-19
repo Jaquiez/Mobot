@@ -15,8 +15,8 @@ module.exports = {
             {
                 len = serverQueue.songs.length;
             }
-            for (k = 10*(pageNumber-1); k < len; k++) {
-                q += (parseInt(k) + 1) + ".) " + `[${serverQueue.songs[k].title}](${serverQueue.songs[k].url})` + "\n";
+            for (k = 10 * (pageNumber - 1); k < len; k++) {
+                q += (parseInt(k) + 1) + ".) " + `| [${serverQueue.songs[k].title}](${serverQueue.songs[k].url})` + ` | ${serverQueue.songs[k].length} \n`;
             }
             return q;
         }
@@ -27,7 +27,7 @@ module.exports = {
             }
             else {
                 for (var key in serverQueue.songs) {
-                    ting += (parseInt(key) + 1) + ".) " + `[${serverQueue.songs[key].title}](${serverQueue.songs[key].url})` + "\n";
+                    ting += (parseInt(key) + 1) + ".) " + `[${serverQueue.songs[key].title}](${serverQueue.songs[key].url})` + ` | ${serverQueue.songs[key].length} \n`;
                 }
             }
             if (ting.length > 2000) {
@@ -65,12 +65,12 @@ module.exports = {
                 .setDescription(`${ting}`)
                 .setColor('#7508cf')
             message.channel.send(embed).then((msg) => {
-
                 checkForReactions(msg);
+                setTimeout(() => {
+                    msg.delete();
+                    return;
+                }, 120000);
             })
-            await setTimeout(() => {
-                return;
-            }, 300000);
         }
         else {
             return message.channel.send("No songs are in the queue!");

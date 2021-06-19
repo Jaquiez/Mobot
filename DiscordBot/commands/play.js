@@ -3,8 +3,8 @@ var { google } = require('googleapis');
 var SpotifyWebApi = require('spotify-web-api-node');
 const { exec } = require('child_process');
 const fetch = require("node-fetch");
-const jsdom = require("jsdom");
-const { script } = require('googleapis/build/src/apis/script');
+//const jsdom = require("jsdom");
+//const { script } = require('googleapis/build/src/apis/script');
 require('dotenv').config()
 module.exports = {
     name: 'play',
@@ -26,15 +26,15 @@ module.exports = {
                 }, 300000);
                 return;
             }
+            const stream = ytdl(song.url, { filter: 'audioonly' });
             const embed = new Discord.MessageEmbed()
-                .setTitle(`Now playing: ${song.title}`)
-                .setDescription(`[${song.title}](${song.url}) | ${message.author}`)
+                .setTitle(`Now playing:`)
+                .setDescription(`[${song.title}](${song.url}) | ${song.requester}`)
                 .setColor('#7508cf')
             message.channel.send(embed).then(async msg=>
             {
                 var finished = false;
-                var error = false
-                const stream = ytdl(song.url, { filter: 'audioonly' });
+                var error = false;      
                 songQueue.connection.play(stream, { seak: 0, volume: 1 })
                     .on('finish', () => {
                         songQueue.songs.shift();
@@ -76,7 +76,9 @@ module.exports = {
                         if (item.videoRenderer) {
                             song = {
                                 title: item.videoRenderer.title.runs[0].text,
-                                url: "https://www.youtube.com/watch?v=" + item.videoRenderer.videoId
+                                url: "https://www.youtube.com/watch?v=" + item.videoRenderer.videoId,
+                                length: item.videoRenderer.lengthText.simpleText,
+                                requester: message.author
                             }
                             resolve(song);
                             return false;
@@ -124,9 +126,13 @@ module.exports = {
         //If not look up and "find" the video on youtube
         if (ytdl.validateURL(args[0])) {
             const songInfo = await ytdl.getInfo(args[0]);
+            var songLength = new Date(songInfo.videoDetails.lengthSeconds * 1000).toISOString();
             song = {
                 title: songInfo.videoDetails.title,
                 url: songInfo.videoDetails.video_url,
+                //1970-01-01T01:03:14.000Z
+                length: songLength.substring(1+songLength.indexOf("T"),songLength.indexOf(".")),
+                requester: message.author
             };
         }
         //Checking if the arguments contains a youtube playlist
@@ -149,11 +155,14 @@ module.exports = {
                         var playlist = response.data;
                         if (playlist.length == 0) {
                         } else {
-                            playlist.items.forEach(element => {
+                            playlist.items.forEach(async element => {
                                 song = {
                                     title: element.snippet.title,
                                     url: "https://www.youtube.com/watch?v=" + element.contentDetails.videoId,
-                                };
+                                    length: "",
+                                    requester: message.author
+                                }
+                                console.log(song);
                                 songs.push(song);
                             })
                             if (playlist.nextPageToken) {
@@ -192,13 +201,7 @@ module.exports = {
                     artists += artist.name + " ";
                 })
                 artists.substring(0, artists.lastIndexOf(" "));
-                const video = await find_video(response.body.name, " - ", artists);
-                if (video) {
-                    song = {
-                        title: video.title,
-                        url: video.url,
-                    };
-                }
+                song = await find_video(response.body.name, " - ", artists);
             })
         }
         else if (args[0].startsWith("https://open.spotify.com/album/"))
@@ -220,12 +223,15 @@ module.exports = {
                 return new Promise(resolve => {
                     spotifyApi.getAlbumTracks(albumID).then(async response => {
                         var index = 0;
-                        let songs = []
+                        let songs = new Array(response.body.items.length);
                         response.body.items.forEach(async (item,i) => {
                             const song = await find_video(item.artists[0].name + "-" + item.name );
                             //Makes sure songs are in order, splice by index
                             if (song !== null) {
-                                songs.splice(i, 0, song);
+                                songs.splice(i, 1, song);
+                            }
+                            else {
+                                songs.delete(i);
                             }
                             index++;
                             if (index === response.body.items.length) {
@@ -278,17 +284,10 @@ module.exports = {
             songsInQ = await fillSongs();
         }
         else{
-            const video = await find_video(args.join(' '));
-            if (video) {
-                song = {
-                    title: video.title,
-                    url: video.url,
-                };
-            }
-            else {
-                console.log("error");
-                return message.channel.send("Could not find a video on: " + args.join(' '));
-            }
+            song = await find_video(args.join(' ')).catch(err => {
+                console.log(err);
+                return message.channel.send(`Could not find a video on => ${args.join(' ')}`);
+            })
         }
         if (!serverQueue) {
             const queueConstructor = {
