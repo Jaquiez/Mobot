@@ -69,11 +69,11 @@ module.exports = {
                 fetch(encodeURI("https://www.youtube.com/results?search_query=" + query)).then(async function (response) {
                     return response.text();           
                 }).then(async function (html) {
-                    var parsedScript = html.substring(html.indexOf("var ytInitialData = ")+"var ytInitialData = ".length,1+html.indexOf("};", html.indexOf("var ytInitialData =")))
-                    parsedScript = JSON.parse(parsedScript);
-                    var ting;
-                    //Can't resolve my promise inside this foreach???? I'm going to look into it but this gives a better result for some reason....
-                    parsedScript.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents.every(item => {
+                    var Script = html.substring(html.indexOf("var ytInitialData = ")+"var ytInitialData = ".length,1+html.indexOf("};", html.indexOf("var ytInitialData =")))
+                    return JSON.parse(Script);
+                }).then(async function(parsedScript)
+                {
+                    parsedScript.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents.forEach(item => {
                         if (item.videoRenderer) {
                             song = {
                                 title: item.videoRenderer.title.runs[0].text,
@@ -81,15 +81,17 @@ module.exports = {
                                 length: item.videoRenderer.lengthText.simpleText,
                                 requester: message.author
                             }
-                            return resolve(song);
-                            return false;
+                            resolve(song);
+                            throw {};
                         }
                     })
-                    reject("An error occured when parsing I think -> " + parsedScript.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents[0]);
-                }).catch(function (err) {                   
-                    console.error(encodeURI("https://www.youtube.com/results?search_query=" + query));
-                    reject("Something went wrong -> ", err);
-                });
+                    return reject(parsedScript.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents[1]);
+                }).catch((err)=>{
+                    if(err !== {})
+                    {
+                        reject(err);
+                    }
+                })
             })
         }
         //Gets spotify token by execute shell command
@@ -228,11 +230,13 @@ module.exports = {
                         response.body.items.forEach(async (item,i) => {
                             const song = await find_video(item.artists[0].name + "-" + item.name).catch((err) => {
                                 console.error(err);
-                                //songs.splice(i, 1);
                             })
-                            console.log(item.name);
                             //Makes sure songs are in order, splice by index
-                            songs.splice(i, 1, song);
+                            if(song !== undefined)
+                            {
+                                songs.splice(i, 1, song);
+                            }
+
                             index++;
                             if (index === response.body.items.length) {
                                 resolve(songs);
@@ -263,14 +267,13 @@ module.exports = {
                         let songs = new Array(response.body.items.length);
                         var i = 0;     
                         response.body.items.forEach(async (item,index) => {
-                            const song = await find_video(item.track.artists[0].name + " - " + item.track.name);
-                            if (song !== null) {
-                                songs.splice(index, 1, song);
-                            }
-                            else
+                            const song = await find_video(item.track.artists[0].name + " - " + item.track.name).catch((err)=>
                             {
-                                console.log(`Couldn't play -> ${item.track.name}`);
-                                //console.log(song);
+                                console.error(err);
+                            })
+                            if(song !== undefined)
+                            {
+                                songs.splice(index, 1, song);
                             }
                             i++;
                             if (i === response.body.items.length)
