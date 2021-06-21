@@ -66,7 +66,7 @@ module.exports = {
         //Finds video by getting html page of a search query
         const find_video = (query) => {
             return new Promise((resolve,reject) => {
-                fetch(encodeURI("https://www.youtube.com/results?search_query=" + query)).then(async function (response) {
+                fetch(encodeURI("https://www.youtube.com/results?search_query=" + query) + "&sp=EgIQAQ%253D%253D").then(async function (response) {
                     return response.text();           
                 }).then(async function (html) {
                     var Script = html.substring(html.indexOf("var ytInitialData = ")+"var ytInitialData = ".length,1+html.indexOf("};", html.indexOf("var ytInitialData =")))
@@ -85,7 +85,7 @@ module.exports = {
                             throw {};
                         }
                     })
-                    return reject(parsedScript.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents[1]);
+                    return reject("An error occured when searching the parsed document for -> "+ query);
                 }).catch((err)=>{
                     if(err !== {})
                     {
@@ -126,14 +126,12 @@ module.exports = {
         let song = {};
         var songsInQ = [];
         //Checks if link is sent, if so just take the info from the link
-        //If not look up and "find" the video on youtube
         if (ytdl.validateURL(args[0])) {
             const songInfo = await ytdl.getInfo(args[0]);
             var songLength = new Date(songInfo.videoDetails.lengthSeconds * 1000).toISOString();
             song = {
                 title: songInfo.videoDetails.title,
                 url: songInfo.videoDetails.video_url,
-                //1970-01-01T01:03:14.000Z
                 length: songLength.substring(1+songLength.indexOf("T"),songLength.indexOf(".")),
                 requester: message.author
             };
@@ -165,7 +163,6 @@ module.exports = {
                                     length: "",
                                     requester: message.author
                                 }
-                                console.log(song);
                                 songs.push(song);
                             })
                             if (playlist.nextPageToken) {
@@ -236,7 +233,6 @@ module.exports = {
                             {
                                 songs.splice(i, 1, song);
                             }
-
                             index++;
                             if (index === response.body.items.length) {
                                 resolve(songs);
@@ -261,39 +257,40 @@ module.exports = {
               {
                 listID = args[0].substring(args[0].indexOf("t/")+"t/".length,args[0].indexOf("?"));
             }
-            function fillSongs(nextPage) {
+            function fillSongs(offset) {
                 return new Promise(resolve => {
-                    spotifyApi.getPlaylistTracks(listID, {offset: nextPage}).then(async response => {
+                    spotifyApi.getPlaylistTracks(listID, {offset: offset}).then(async response => {
                         let songs = new Array(response.body.items.length);
-                        var i = 0;     
-                        response.body.items.forEach(async (item,index) => {
+                        var i = 0;   
+                        response.body.items.forEach(async (item,index,arr) => {
                             const song = await find_video(item.track.artists[0].name + " - " + item.track.name).catch((err)=>
                             {
                                 console.error(err);
+                                return;
                             })
-                            if(song !== undefined)
+                            if(song)
                             {
                                 songs.splice(index, 1, song);
                             }
                             i++;
-                            if (i === response.body.items.length)
+                            if(i===arr.length)
                             {
-                                if(response.body.next)
-                                {
-                                    var nextCall = response.body.next;
-                                    songs = songs.concat(await fillSongs(parseInt(nextCall.substring(nextCall.indexOf("offset=")+"offset=".length,nextCall.indexOf("&limit")))));
+                                if (response.body.next) {
+                                    offset += 100;
+                                    songs = songs.concat(await fillSongs(offset))
                                     resolve(songs);
                                 }
-                                else
-                                {
+                                else {
                                     resolve(songs);
                                 }
                             }
-                        })
+                        })                        
                     })
                 })             
             }
-            songsInQ = await fillSongs();
+            console.time("Full call");
+            songsInQ = await fillSongs(0);
+            console.timeEnd("Full call");
         }
         else{
             song = await find_video(args.join(' ')).catch(err => {
