@@ -26,7 +26,10 @@ module.exports = {
                 }, 300000);
                 return;
             }
-            const stream = ytdl(song.url, { filter: 'audioonly' });
+            const stream = ytdl(song.url, {
+                filter: 'audioonly',
+                quality: 'highestaudio'
+            });
             const embed = new Discord.MessageEmbed()
                 .setTitle(`Now playing:`)
                 .setDescription(`[${song.title}](${song.url}) | ${song.requester}`)
@@ -37,12 +40,13 @@ module.exports = {
                 var error = false;      
                 songQueue.connection.play(stream, { seak: 0, volume: 1 })
                     .on('finish', () => {
+                        finished = true;
                         songQueue.songs.shift();
                         msg.delete();
                         video_player(guild, songQueue.songs[0]);
-                        finished = true;
-                    })
-                    .on('error', () =>{
+                    })                   
+                    .on('error', (err) => {
+                        console.error(err);
                         error = true;
                         songQueue.songs.shift();
                         embed.setTitle(`An error occured when playing -> ${song.title}`)
@@ -65,33 +69,30 @@ module.exports = {
         }
         //Finds video by getting html page of a search query
         const find_video = (query) => {
-            return new Promise((resolve,reject) => {
-                fetch(encodeURI("https://www.youtube.com/results?search_query=" + query) + "&sp=EgIQAQ%253D%253D").then(async function (response) {
-                    return response.text();           
-                }).then(async function (html) {
-                    var Script = html.substring(html.indexOf("var ytInitialData = ")+"var ytInitialData = ".length,1+html.indexOf("};", html.indexOf("var ytInitialData =")))
-                    return JSON.parse(Script);
-                }).then(async function(parsedScript)
-                {
-                    parsedScript.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents.forEach(item => {
-                        if (item.videoRenderer) {
-                            song = {
-                                title: item.videoRenderer.title.runs[0].text,
-                                url: "https://www.youtube.com/watch?v=" + item.videoRenderer.videoId,
-                                length: item.videoRenderer.lengthText.simpleText,
-                                requester: message.author
-                            }
-                            resolve(song);
-                            throw {};
-                        }
-                    })
-                    return reject("An error occured when searching the parsed document for -> "+ query);
-                }).catch((err)=>{
-                    if(err !== {})
+            return new Promise(async (resolve,reject) => {
+                var response = await fetch(encodeURI("https://www.youtube.com/results?search_query=" + query) + "&sp=EgIQAQ%253D%253D");
+                var html = await response.text();
+                //var Script = html.substring(html.indexOf("var ytInitialData = ")+"var ytInitialData = ".length,1+html.indexOf("};", html.indexOf("var ytInitialData =")))
+                var parsedScript = JSON.parse(html.substring(html.indexOf("var ytInitialData = ") + "var ytInitialData = ".length, 1 + html.indexOf("};", html.indexOf("var ytInitialData ="))));
+
+                for (let k = 0; k < parsedScript.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents.length; k++) {
+                    var item = parsedScript.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents[k];
+                    if (item.videoRenderer)
                     {
-                        reject(err);
+                        song = {
+                            title: item.videoRenderer.title.runs[0].text,
+                            url: "https://www.youtube.com/watch?v=" + item.videoRenderer.videoId,
+                            length: item.videoRenderer.lengthText.simpleText,
+                            requester: message.author
+                        }
+                        console.log(song);
+                        resolve(song);    
+                        break;
                     }
-                })
+                }
+                reject("Error occured when parsing the response for => " + query);
+            }).catch((err) => {
+                console.log(err);
             })
         }
         //Gets spotify token by execute shell command
@@ -128,11 +129,15 @@ module.exports = {
         //Checks if link is sent, if so just take the info from the link
         if (ytdl.validateURL(args[0])) {
             const songInfo = await ytdl.getInfo(args[0]);
-            var songLength = new Date(songInfo.videoDetails.lengthSeconds * 1000).toISOString();
+            var songLength = "???";
+            if (songInfo.videoDetails.lengthSeconds) {
+                songLength = new Date(songInfo.videoDetails.lengthSeconds * 1000).toISOString();
+                songLength = songLength.substring(1 + songLength.indexOf("T"), songLength.indexOf("."))
+            }
             song = {
                 title: songInfo.videoDetails.title,
                 url: songInfo.videoDetails.video_url,
-                length: songLength.substring(1+songLength.indexOf("T"),songLength.indexOf(".")),
+                length: songLength,
                 requester: message.author
             };
         }
@@ -166,8 +171,7 @@ module.exports = {
                                 songs.push(song);
                             })
                             if (playlist.nextPageToken) {
-                                nextToken = playlist.nextPageToken;
-                                await getVideos(url, nextToken);
+                                await getVideos(url, playlist.nextPageToken);
                                 resolve(songs);
                             }
                             else {
@@ -195,14 +199,13 @@ module.exports = {
               {
                 trackID = args[0].substring(args[0].indexOf("k/")+"k/".length,args[0].indexOf("?"));
               }
-            await spotifyApi.getTrack(trackID).then(async response => {
-                artists = "";
-                response.body.artists.forEach(artist => {
-                    artists += artist.name + " ";
-                })
-                artists.substring(0, artists.lastIndexOf(" "));
-                song = await find_video(response.body.name, " - ", artists);
+            var response = await spotifyApi.getTrack(trackID)
+            artists = "";
+            response.body.artists.forEach(artist => {
+                artists += artist.name + " ";
             })
+            artists.substring(0, artists.lastIndexOf(" "));
+            song = await find_video(response.body.name, " - ", artists);
         }
         else if (args[0].startsWith("https://open.spotify.com/album/"))
         {
@@ -220,25 +223,21 @@ module.exports = {
             }
                  
             function getSongs(albumID) {
-                return new Promise(resolve => {
-                    spotifyApi.getAlbumTracks(albumID).then(async response => {
-                        var index = 0;
-                        let songs = new Array(response.body.items.length);
-                        response.body.items.forEach(async (item,i) => {
-                            const song = await find_video(item.artists[0].name + "-" + item.name).catch((err) => {
-                                console.error(err);
-                            })
-                            //Makes sure songs are in order, splice by index
-                            if(song !== undefined)
-                            {
-                                songs.splice(i, 1, song);
-                            }
-                            index++;
-                            if (index === response.body.items.length) {
-                                resolve(songs);
-                            }
-                        })                        
-                    })
+                return new Promise(async resolve => {
+                    var response = await spotifyApi.getAlbumTracks(albumID)
+                    var index = 0;
+                    let songs = new Array(response.body.items.length);
+                    response.body.items.forEach(async (item, i) => {
+                        const song = await find_video(item.artists[0].name + " - " + item.name);
+                        //Makes sure songs are in order, splice by index
+                        if (song) {
+                            songs.splice(i, 1, song);
+                        }
+                        index++;
+                        if (index === response.body.items.length) {
+                            resolve(songs);
+                        }
+                    })                        
                 })
             }
             songsInQ = await getSongs(albumID);
@@ -258,45 +257,38 @@ module.exports = {
                 listID = args[0].substring(args[0].indexOf("t/")+"t/".length,args[0].indexOf("?"));
             }
             function fillSongs(offset) {
-                return new Promise(resolve => {
-                    spotifyApi.getPlaylistTracks(listID, {offset: offset}).then(async response => {
-                        let songs = new Array(response.body.items.length);
-                        var i = 0;   
-                        response.body.items.forEach(async (item,index,arr) => {
-                            const song = await find_video(item.track.artists[0].name + " - " + item.track.name).catch((err)=>
-                            {
-                                console.error(err);
-                                return;
-                            })
-                            if(song)
-                            {
-                                songs.splice(index, 1, song);
+                return new Promise(async resolve => {
+                    var response = await spotifyApi.getPlaylistTracks(listID, { offset: offset })
+                    let songs = new Array(response.body.items.length);
+                    var i = 0;
+                    response.body.items.forEach(async (item, index, arr) => {
+                        songs.splice(index,1,await find_video(item.track.artists[0].name + " - " + item.track.name));
+                        if (!songs[index]) {
+                            songs.splice(index, 1);
+                        }
+                        i++;
+                        if (i === arr.length) {
+                            if (response.body.next) {
+                                offset += 100;
+                                songs = songs.concat(await fillSongs(offset))
+                                resolve(songs);
                             }
-                            i++;
-                            if(i===arr.length)
-                            {
-                                if (response.body.next) {
-                                    offset += 100;
-                                    songs = songs.concat(await fillSongs(offset))
-                                    resolve(songs);
-                                }
-                                else {
-                                    resolve(songs);
-                                }
+                            else {
+                                resolve(songs);
                             }
-                        })                        
+                        }
                     })
-                })             
+                })           
             }
             console.time("Full call");
             songsInQ = await fillSongs(0);
             console.timeEnd("Full call");
         }
         else{
-            song = await find_video(args.join(' ')).catch(err => {
-                console.log(err);
-                return message.channel.send(`Could not find a video on => ${args.join(' ')}`);
-            })
+            song = await find_video(args.join(' '));
+            if (!song) {
+                return message.channel.send(`Could not find a video on -> ${args.join(' ')}`);
+            }
         }
         if (!serverQueue) {
             const queueConstructor = {
