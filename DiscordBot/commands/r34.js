@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 const jsdom = require("jsdom");
 
 module.exports = {
-    name: 'r34',
+    names: ['r34','rule34'],
     description: 'Gives you a random r34 image of said thing',
     permissions: [],
 

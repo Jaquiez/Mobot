@@ -1,5 +1,5 @@
 module.exports = {
-    name: 'clean',
+    names: ["clean"],
     description: 'Cleans the number of messages that the user specifies',
     permissions: ["MANAGE_MESSAGES"],
 

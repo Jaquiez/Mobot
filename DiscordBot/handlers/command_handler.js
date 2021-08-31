@@ -6,8 +6,10 @@ module.exports = (client, Discord) => {
     for (const file of command_files) {
         //Embeds file name into const command
         const command = require(`../commands/${file}`);
-        if (command.name) {
-            client.commands.set(command.name, command);
+        if (command.names) {
+            command.names.forEach(element => {
+                client.commands.set(element, command);
+            });
         } else {
             continue;
         }

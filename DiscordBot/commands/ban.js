@@ -1,5 +1,5 @@
 module.exports = {
-    name: 'ban',
+    names: ["ban"],
     description: 'Bans a member',
     permissions: ["BAN_MEMBERS"],
 

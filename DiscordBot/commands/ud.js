@@ -2,7 +2,7 @@ var Scraper = require('images-scraper');
 const fetch = require("node-fetch");
 const jsdom = require("jsdom");
 module.exports = {
-    name: 'ud',
+    names: ['ud'],
     description: 'Gets the urban dictionary definition of a word/term',
     permissions: [],
 

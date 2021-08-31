@@ -2,7 +2,7 @@
 const googleTTS = require('google-tts-api');
 const ffmpeg = require('ffmpeg');
 module.exports = {
-    name: 'tts',
+    names: ['tts'],
     description: 'speaks the words said in the voice chat the user is connected to [IN DEVELOPMENT]',
     permissions: [],
 

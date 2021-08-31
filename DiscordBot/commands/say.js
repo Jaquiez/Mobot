@@ -1,5 +1,5 @@
 module.exports = {
-    name: 'say',
+    names: ['say'],
     description: 'Makes the bot say whatever follows the command, and deletes the call to the command from the chat',
     permissions: [],
         

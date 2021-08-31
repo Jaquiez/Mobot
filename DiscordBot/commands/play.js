@@ -7,7 +7,7 @@ const fetch = require("node-fetch");
 //const { script } = require('googleapis/build/src/apis/script');
 require('dotenv').config()
 module.exports = {
-    name: 'play',
+    names: ["play","p"],
     description: 'Plays the song specified',
     permissions: [],
     async execute(client, message, args, Discord, queue) {
@@ -23,7 +23,7 @@ module.exports = {
                     if (queue.get(guild.id) === undefined){
                         songQueue.voice_channel.leave();
                     }
-                }, 300000);
+                }, 3000000);
                 return;
             }
             const stream = ytdl(song.url, {

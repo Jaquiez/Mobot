@@ -1,6 +1,6 @@
 
 module.exports = {
-    name: 'q',
+    names: ['q','queue'],
     description: 'Displays the songs in the queue',
     permissions: [],
     //PLEASE REWORK THIS

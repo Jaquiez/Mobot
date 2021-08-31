@@ -1,5 +1,5 @@
 module.exports = {
-    name: 'unmute',
+    names: ['unmute'],
     description: 'Unmutes a member [NOT WORKING]',
     permissions: ["MUTE_MEMBERS"],
 

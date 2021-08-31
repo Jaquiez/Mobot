@@ -1,6 +1,6 @@
 const fs = require('fs');
 module.exports = {
-    name: 'help',
+    names: ["help"],
     description: 'Actually why the fuck do you need help with the help command? What a fucking ape',
     permissions: [],
 

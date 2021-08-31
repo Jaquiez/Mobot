@@ -1,6 +1,6 @@
 
 module.exports = {
-    name: 'skip',
+    names: ['skip'],
     description: 'skips the song playing in the bot',
     permissions: [],
 

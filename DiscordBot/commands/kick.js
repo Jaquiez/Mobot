@@ -1,5 +1,5 @@
 module.exports = {
-    name: 'kick',
+    names: ["kick"],
     description: 'Kicks a member',
     permissions: ["KICK_MEMBERS"],
 

@@ -1,5 +1,5 @@
 module.exports = {
-    name: 'shuffle',
+    names: ['shuffle'],
     description: 'shuffles the songs in the queue',
     permissions: [],
     async execute(client, message, args, Discord, queue) {

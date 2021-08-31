@@ -1,7 +1,7 @@
 const { MessageEmbed, Message, Channel, TextChannel } = require("discord.js");
 
 module.exports = {
-    name: 'nuke',
+    names: ['nuke'],
     description: 'Destroys the current channel and creates a new one with the same properties',
     permissions: ["MANAGE_CHANNELS"],
 

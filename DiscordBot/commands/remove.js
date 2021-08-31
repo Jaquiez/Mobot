@@ -1,6 +1,6 @@
 
 module.exports = {
-    name: 'remove',
+    names: ['remove','r'],
     description: 'remove song at the index',
     permissions: [],
 

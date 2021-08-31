@@ -1,5 +1,5 @@
 module.exports = {
-    name: 'clear',
+    names: ["clear"],
     description: 'Clears the entire queue of songs',
     permissions: [],
     async execute(client, message, args, Discord, queue) {
