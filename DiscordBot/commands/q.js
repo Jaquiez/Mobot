@@ -61,7 +61,7 @@ module.exports = {
                 })
             }
             const embed = new Discord.MessageEmbed()
-                .setTitle(`Queue | ${serverQueue.songs.length} songs`)
+                .setTitle(`Queue | ${serverQueue.songs.length} songs | Now playing ${serverQueue.songs[0].title} | ${new Date(serverQueue.connection.player.dispatcher.streamTime).toISOString().substr(11, 8)}`)
                 .setDescription(`${ting}`)
                 .setColor('#7508cf')
             message.channel.send(embed).then((msg) => {

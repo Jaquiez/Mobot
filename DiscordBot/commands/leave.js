@@ -5,7 +5,9 @@ module.exports = {
 
     // Bans one member at a time.
     async execute(client, message, args, Discord, queue) {
-        const serverQueue = await queue.get(message.guild.id);
-        serverQueue.voice_channel.leave();
+        if(message.guild.me.voice.channel)
+            message.guild.me.voice.channel.leave();
+        else
+            message.channel.send("bruh i'm not even in voice");
     }
 }

@@ -23,7 +23,7 @@ module.exports = {
                     if (queue.get(guild.id) === undefined){
                         songQueue.voice_channel.leave();
                     }
-                }, 3000000);
+                }, 600000);
                 return;
             }
             const stream = ytdl(song.url, {
@@ -129,15 +129,10 @@ module.exports = {
         //Checks if link is sent, if so just take the info from the link
         if (ytdl.validateURL(args[0])) {
             const songInfo = await ytdl.getInfo(args[0]);
-            var songLength = "???";
-            if (songInfo.videoDetails.lengthSeconds) {
-                songLength = new Date(songInfo.videoDetails.lengthSeconds * 1000).toISOString();
-                songLength = songLength.substring(1 + songLength.indexOf("T"), songLength.indexOf("."))
-            }
             song = {
                 title: songInfo.videoDetails.title,
                 url: songInfo.videoDetails.video_url,
-                length: songLength,
+                length: "",
                 requester: message.author
             };
         }
