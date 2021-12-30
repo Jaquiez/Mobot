@@ -28,10 +28,11 @@ module.exports = {
             }
             const stream = ytdl(song.url, {
                 filter: 'audioonly',
-                quality: 'highestaudio'
+                quality: 'highestaudio',
+                highWaterMark: 1 << 25
             });
             const embed = new Discord.MessageEmbed()
-                .setTitle(`Now playing:`)
+                .setTitle(`Now playing ↓ | Loop Status: ${songQueue.loop}`)
                 .setDescription(`[${song.title}](${song.url}) | ${song.requester}`)
                 .setColor('#7508cf')
             message.channel.send(embed).then(async msg=>
@@ -41,7 +42,8 @@ module.exports = {
                 songQueue.connection.play(stream, { seak: 0, volume: 1 })
                     .on('finish', () => {
                         finished = true;
-                        songQueue.songs.shift();
+                        if(songQueue.loop==false)
+                            songQueue.songs.shift();
                         msg.delete();
                         video_player(guild, songQueue.songs[0]);
                     })                   
@@ -290,7 +292,8 @@ module.exports = {
                 voice_channel: voiceChannel,
                 text_channel: message.channel,
                 connection: null,
-                songs: []
+                songs: [],
+                loop:false
             }
             queue.set(message.guild.id, queueConstructor);
             if ("title" in song) {

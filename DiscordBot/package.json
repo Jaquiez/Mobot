@@ -7,17 +7,15 @@
     "license": "ISC",
     "dependencies": {
         "@discordjs/opus": "^0.5.3",
-        "discord.js": "^12.5.3",
-        "dotenv": "^8.6.0",
-        "ffmpeg": "0.0.4",
+        "discord.js": "^12.5.0",
+        "dotenv": "^10.0.0",
+        "ffmpeg": "^0.0.4",
         "ffmpeg-static": "^4.4.0",
-        "google-auth-library": "^7.1.2",
         "google-tts-api": "^2.0.2",
-        "googleapis": "^75.0.0",
-        "images-scraper": "^6.3.0",
-        "opusscript": "0.0.8",
+        "googleapis": "^91.0.0",
+        "images-scraper": "^6.4.0",
+        "jsdom": "^18.1.1",
         "spotify-web-api-node": "^5.0.2",
-        "yt-search": "^2.9.0",
-        "ytdl-core": "^4.9.1"
+        "ytdl-core": "^4.9.2"
     }
 }
