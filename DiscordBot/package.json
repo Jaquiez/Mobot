@@ -1,0 +1,21 @@
+{
+    "name": "discord-bot",
+    "version": "0.0.0",
+    "description": "DiscordBot",
+    "main": "app.js",
+    "author": "Jaquiez + DatGuyQuan",
+    "license": "ISC",
+    "dependencies": {
+        "@discordjs/opus": "^0.5.3",
+        "discord.js": "^12.5.0",
+        "dotenv": "^10.0.0",
+        "ffmpeg": "^0.0.4",
+        "ffmpeg-static": "^4.4.0",
+        "google-tts-api": "^2.0.2",
+        "googleapis": "^91.0.0",
+        "images-scraper": "^6.4.0",
+        "jsdom": "^18.1.1",
+        "spotify-web-api-node": "^5.0.2",
+        "ytdl-core": "^4.9.2"
+    }
+}
