@@ -13,7 +13,8 @@ function create() {
     fs.readdirSync('commands').forEach(item => {
         commands.push({
             "name":item.replace('.js', ''),
-            "desc":require(`../commands/${item}`).desc
+            "desc":require(`../commands/${item}`).desc,
+            "altnames":require(`../commands/${item}`).altnames
         });
     })
 }
@@ -29,6 +30,13 @@ function handle(message, client) {
             else {
                 require(`../commands/${cmd}.js`).execute(message, client);
             }
+        }
+        if(command.altnames){
+            command.altnames.forEach(name=>{
+                if(name===cmd){
+                    require(`../commands/${command.name}.js`).execute(message, client);
+                }
+            })
         }
     })
 }

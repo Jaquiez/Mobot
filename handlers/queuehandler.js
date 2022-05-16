@@ -4,7 +4,8 @@ function constructServerQueue(connection){
     let serverQueue ={
         songs:[],
         connection:connection,
-        player:null
+        player:null,
+        loop:false
     };
     masterQueue.set(connection.joinConfig.guildId,serverQueue);
 }

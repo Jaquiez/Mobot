@@ -80,7 +80,6 @@ async function linkify(args, message) {
         await get_videos(args.substring(args.indexOf('?list=') + '?list='.length));
     }
     else if (args.startsWith("https://open.spotify.com")) {
-        console.log("begin");
         let spotifyapi = new SpotifyWebApi({
             clientId: process.env.SPOT_CLIENTID,
             clientSecret: process.env.SPOT_CLIENTSECRET
@@ -108,7 +107,6 @@ async function linkify(args, message) {
                         artists = artists + `${artist.name}`
                     });
                     const song = await yt_search(`${track.body.name} - ${artists}`, message);
-                    console.log(song);
                     songsToAdd.push(song);
                 })
             }
@@ -137,14 +135,11 @@ async function linkify(args, message) {
                             offset: offset 
                         })
                         if(offset===0)
-                        {
-                            console.log(info.body.total)
                             songsToAdd = new Array(info.body.total);
-                        }
 
-                        if (offset >= info.body.total) {
+                        if (offset >= info.body.total) 
                             return resolve();
-                        }
+                            
                         await Promise.all(info.body.items.map(async (trackInfo, index) => {
                             let artists = '';
                             trackInfo.track.artists.forEach(artist => {
@@ -152,14 +147,9 @@ async function linkify(args, message) {
                             })
                             let song = await yt_search(`${trackInfo.track.name} - ${artists}`, message);
                             if (song)
-                            {
-                                console.log(`${song.title} ${index+offset}`);
                                 songsToAdd.splice(index+offset, 1, song);
-                            }
                             else
-                            {
                                 songsToAdd.splice(index+offset, 1);
-                            }
                         }))
                         offset = offset + info.body.limit;
                         await getTracks(id, offset);
@@ -168,7 +158,6 @@ async function linkify(args, message) {
                 }
                 await getTracks(playId, 0);
             }
-            console.log("out");
             resolve(songsToAdd);
 
         })
@@ -178,7 +167,6 @@ async function linkify(args, message) {
         const song = await yt_search(args, message);
         songsToAdd.push(song);
     }
-    console.log("end");
     message.channel.send(`Added ${songsToAdd.length} songs to the queue`);
     return songsToAdd;
 }

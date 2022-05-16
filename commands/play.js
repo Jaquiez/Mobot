@@ -24,6 +24,7 @@ async function execute(message,client) {
 }
 
 module.exports = {
+    altnames: ['p'],
     perms: [],
     desc: "MoBot will play the song in the [argument]",
     execute

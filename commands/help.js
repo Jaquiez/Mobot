@@ -7,7 +7,6 @@ function execute(message,client) {
     const embed = new MessageEmbed()
         .setTitle('Commands')
         .setDescription(help)
-        .setColor('#ff1122');
     message.channel.send({embeds:[embed]});    
 }
 

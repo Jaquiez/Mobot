@@ -7,7 +7,7 @@ function getList(num, songs) {
         len = songs.length;
     }
     for (let s = (num - 1) * 10; s < len; s++) {
-        data = data + `${s + 1}.) **${songs[s].title}** | ${songs[s].length} | ${songs[s].requester}\n`;
+        data = data + `${s + 1}.) [${songs[s].title}](${songs[s].url}) | ${songs[s].length} | ${songs[s].requester}\n`;
     }
     return data;
 }
@@ -27,12 +27,12 @@ async function execute(message, client) {
     let guildId = message.channel.guildId;
     let num = 1;
     if (!queuehandler.masterQueue.has(guildId)) {
-        message.channel.send("I'm not in a channel!");
+        message.reply("I have no queue?");
         return;
     }
     let serverQueue = queuehandler.masterQueue.get(guildId);
     let embed = await new MessageEmbed()
-        .setTitle(`Queue: Currently playing -> ${serverQueue.songs[0].title} | ${getSongTime(serverQueue)}`)
+        .setTitle(`${serverQueue.songs[0].title} | ${getSongTime(serverQueue)}`)
         .setDescription(getList(num, serverQueue.songs));
     message.channel.send({ embeds: [embed] }).then((msg)=> {
         setTimeout(()=>{
@@ -57,7 +57,7 @@ async function execute(message, client) {
                     console.log(e)
                     return;
                 }
-                embed.setTitle(`Queue: Currently playing -> ${serverQueue.songs[0].title} | ${getSongTime(serverQueue)}`)
+                embed.setTitle(`${serverQueue.songs[0].title} | ${getSongTime(serverQueue)}`)
                 embed.setDescription(getList(num,serverQueue.songs));
                 msg.edit({ embeds: [embed] });
                 msg.reactions.removeAll();
@@ -72,6 +72,7 @@ async function execute(message, client) {
 }
 
 module.exports = {
+    altnames: ['queue'],
     perms: [],
     desc: "MoBot will play the song in the [argument]",
     execute

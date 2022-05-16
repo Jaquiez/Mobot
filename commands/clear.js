@@ -5,7 +5,7 @@ async function execute(message,client) {
     let guildId = message.channel.guildId;
     if(!queuehandler.masterQueue.has(guildId))
     {
-        message.channel.send("I'm not in a channel!");
+        message.reply("I have no queue?")
         return;
     }
     queuehandler.masterQueue.get(guildId).player.stop();

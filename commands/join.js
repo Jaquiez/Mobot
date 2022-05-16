@@ -18,6 +18,7 @@ async function execute(message,client) {
 }
 
 module.exports = {
+    altnames: ['j'],
     perms: [],
     desc: "MoBot will join the voice channel",
     execute
