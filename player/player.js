@@ -22,11 +22,26 @@ async function playSong(serverQueue,guildId,message) {
             msg.delete();
             playSong(serverQueue,guildId,message);
         })
+        .on('error',()=>{
+            serverQueue.songs.shift();
+            embed.setDescription("An error has occurred!");
+            setTimeout(()=>{
+                msg.delete();
+            },5000)
+            playSong(serverQueue,guildId,message);
+        })
     const stream = ytdl(song.url, {
+        requestOptions:{
+            headers:{
+                'x-youtube-identity-token': process.env.YT_CLIENT,
+                cookie: process.env.YT_COOKIE
+            }
+        },
         filter: 'audioonly',
         quality: 'highestaudio',
-        highWaterMark: 1 << 25
-    });
+        highWaterMark: 1 << 25,
+
+    })
     let resource = createAudioResource(stream);
     player.play(resource);
     serverQueue.player = player;

@@ -16,6 +16,7 @@ function getSongTime(serverQueue){
     try{
         time = new Date(serverQueue.player._state.playbackDuration).toISOString().substring(11,19)
     }catch(e){
+        console.log(e);
         return '?';
 
     }
@@ -31,8 +32,8 @@ async function execute(message, client) {
     }
     let serverQueue = queuehandler.masterQueue.get(guildId);
     let embed = await new MessageEmbed()
-        .setTitle(`Queue: Currently playing -> ${serverQueue.songs[0].title} | ${getSongTime()}`)
-        .setDescription(getList(num, serverQueue.songs))
+        .setTitle(`Queue: Currently playing -> ${serverQueue.songs[0].title} | ${getSongTime(serverQueue)}`)
+        .setDescription(getList(num, serverQueue.songs));
     message.channel.send({ embeds: [embed] }).then((msg)=> {
         setTimeout(()=>{
             msg.delete();
