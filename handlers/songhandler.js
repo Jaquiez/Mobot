@@ -17,13 +17,14 @@ const yt_search = (query, message,retry) => {
                     length: item.videoRenderer.lengthText.simpleText,
                     requester: message.author
                 }
-                resolve(song);
-                break;
+                return resolve(song);
             }
         }
+        console.log(retry)
         if(retry<1)
             reject("Error occured when parsing the response for => " + query);
-        resolve(await yt_search(query,message,retry-1))
+        else
+            resolve(await yt_search(query,message,retry-1))
     }).catch((err) => {
         console.log(err);
     })
@@ -173,6 +174,7 @@ async function linkify(args, message) {
         songsToAdd.push(song);
     }
     songsToAdd = songsToAdd.filter(Boolean);
+    console.log("bruh");
     message.channel.send(`Added ${songsToAdd.length} songs to the queue`);
     return songsToAdd;
 }
