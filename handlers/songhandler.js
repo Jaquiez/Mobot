@@ -2,8 +2,7 @@ const fetch = require('node-fetch');
 const ytdl = require('ytdl-core');
 const play = require('../commands/play');
 var SpotifyWebApi = require('spotify-web-api-node');
-const { get } = require('spotify-web-api-node/src/http-manager');
-const yt_search = (query, message) => {
+const yt_search = (query, message,retry) => {
     return new Promise(async (resolve, reject) => {
         //console.log(encodeURI("https://www.youtube.com/results?search_query=" + query) + "&sp=EgIQAQ%253D%253D");
         var response = await fetch(encodeURI("https://www.youtube.com/results?search_query=" + query) + "&sp=EgIQAQ%253D%253D");
@@ -22,7 +21,9 @@ const yt_search = (query, message) => {
                 break;
             }
         }
-        reject("Error occured when parsing the response for => " + query);
+        if(retry<1)
+            reject("Error occured when parsing the response for => " + query);
+        resolve(await yt_search(query,message,retry-1))
     }).catch((err) => {
         console.log(err);
     })
@@ -113,6 +114,7 @@ async function linkify(args, message) {
             else if (args.includes('album')) {
                 let albumId = args.substring(args.indexOf('album') + 'album/'.length, trackEnd);
                 let info = await spotifyapi.getAlbum(albumId)
+                songsToAdd = new Array(info.body.total);
                 await Promise.all(info.body.tracks.items.map(async (track, index) => {
                     let artists = '';
                     track.artists.forEach(artist => {
@@ -120,11 +122,12 @@ async function linkify(args, message) {
                     });
                     let song = await yt_search(`${track.name} - ${artists}`, message)
                     if (song)
-                        songsToAdd.splice(index, 0, song);
+                        songsToAdd[index]= song;
                     else
-                        songsToAdd.splice(index, 1);
-                }))
+                        songsToAdd.splice(index,1);
 
+                    console.log(`${index} and ${song.title}`)
+                }))
             }
             else if (args.includes('playlist')) {
                 let playId = args.substring(args.indexOf('playlist') + 'playlist/'.length, trackEnd);
@@ -134,39 +137,42 @@ async function linkify(args, message) {
                             limit:100,
                             offset: offset 
                         })
-                        if(offset===0)
-                            songsToAdd = new Array(info.body.total);
-
-                        if (offset >= info.body.total) 
-                            return resolve();
-                            
+                        let songs = new Array(info.body.items.length);
+                        if (info.body.offset >= info.body.total) 
+                            return resolve(songs);
                         await Promise.all(info.body.items.map(async (trackInfo, index) => {
                             let artists = '';
                             trackInfo.track.artists.forEach(artist => {
                                 artists = artists + ` ${artist.name}`;
                             })
-                            let song = await yt_search(`${trackInfo.track.name} - ${artists}`, message);
+                            let song = await yt_search(`${trackInfo.track.name} - ${artists}`,message,3);
                             if (song)
-                                songsToAdd.splice(index+offset, 1, song);
-                            else
-                                songsToAdd.splice(index+offset, 1);
+                                songs[index]=song;
                         }))
                         offset = offset + info.body.limit;
-                        await getTracks(id, offset);
-                        resolve(songsToAdd);
+                        let val = await getTracks(id, offset);
+                        songs.push.apply(songs,val);
+                        resolve(songs);
                     })
                 }
-                await getTracks(playId, 0);
+                songsToAdd = await getTracks(playId, 0);
             }
+            
             resolve(songsToAdd);
 
         })
 
     }
     else {
-        const song = await yt_search(args, message);
+        const song = await yt_search(args, message,3);
+        if(!song)
+        {
+            message.channel.send(`Couldn't find ${args}`)
+            return [];
+        }
         songsToAdd.push(song);
     }
+    songsToAdd = songsToAdd.filter(Boolean);
     message.channel.send(`Added ${songsToAdd.length} songs to the queue`);
     return songsToAdd;
 }
