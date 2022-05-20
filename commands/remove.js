@@ -9,15 +9,15 @@ async function execute(message,client) {
         return;
     }
     let songs = queuehandler.masterQueue.get(guildId).songs;
-    for(let s=1;s<songs.length;s++)
+    let args = message.content.split(' ').slice(1);
+    let num= parseInt(args[0])-1;
+    if(isNaN(num) || num < 1 || num > (songs.length-1))
     {
-        let temp = songs[s];
-        let rand = 1+Math.floor(Math.random()*(songs.length-1));
-        songs[s] = songs[rand];
-        songs[rand] = temp;
+        message.channel.send(`You tried removing song ${num+1} but it's invalid`);
+        return;
     }
-    queuehandler.masterQueue.get(guildId).songs = songs;
-    message.channel.send(`Finished shuffling ${songs.length} songs`);
+    message.channel.send(`Removed ${songs[num].title} from the queue`);
+    songs.splice(num,1);
 }
 
 module.exports = {

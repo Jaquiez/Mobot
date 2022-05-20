@@ -1,5 +1,5 @@
 const {MessageEmbed} = require('discord.js');
-function execute(message,client) {
+async function execute(message,client) {
     let help = "";
     require('../handlers/command_handler.js').commands.forEach(command=>{
         help = help + `**${command.name}**: ${command.desc}\n`;

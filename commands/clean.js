@@ -1,5 +1,5 @@
 const {Permissions} = require('discord.js')
-function execute(message,client) {
+async function execute(message,client) {
     let args = message.content.split(' ').slice(1);
     let num= parseInt(args[0]);
     if(isNaN(num) || num < 1 || num > 99)
