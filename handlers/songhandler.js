@@ -109,7 +109,7 @@ async function linkify(args, message) {
                         track.body.artists.forEach(artist => {
                             artists = artists + `${artist.name}`;
                         });
-                        let song = await yt_search(`${track.body.name} - ${artists} (Audio)`, message,3);
+                        let song = await yt_search(`${track.body.name} - ${artists}`, message,3);
                         resolve(songsToAdd.push(song));
                     }).catch(error=>{
                         reject(error);
@@ -125,7 +125,7 @@ async function linkify(args, message) {
                     track.artists.forEach(artist => {
                         artists = artists + ` ${artist.name}`
                     });
-                    let song = await yt_search(`${track.name} - ${artists} (Audio)`, message,3)
+                    let song = await yt_search(`${track.name} - ${artists}`, message,3)
                     if (song)
                         songsToAdd[index]= song;
                     else
@@ -150,7 +150,7 @@ async function linkify(args, message) {
                             trackInfo.track.artists.forEach(artist => {
                                 artists = artists + ` ${artist.name}`;
                             })
-                            let song = await yt_search(`${trackInfo.track.name} - ${artists} (Audio)`,message,3);
+                            let song = await yt_search(`${trackInfo.track.name} - ${artists}`,message,3);
                             if (song)
                                 songs[index]=song;
                         }))
