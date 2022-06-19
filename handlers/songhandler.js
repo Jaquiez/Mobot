@@ -103,13 +103,17 @@ async function linkify(args, message) {
         await new Promise(async (resolve, reject) => {
             if (args.includes('track')) {
                 let trackId = args.substring(args.indexOf('track') + 'track/'.length, trackEnd);
-                spotifyapi.getTrack(trackId).then(async track => {
-                    let artists = '';
-                    track.body.artists.forEach(artist => {
-                        artists = artists + `${artist.name}`
-                    });
-                    const song = await yt_search(`${track.body.name} - ${artists}`, message);
-                    songsToAdd.push(song);
+                await new Promise(async (resolve)=>{
+                    spotifyapi.getTrack(trackId).then(async track => {
+                        let artists = '';
+                        track.body.artists.forEach(artist => {
+                            artists = artists + `${artist.name}`;
+                        });
+                        let song = await yt_search(`${track.body.name} - ${artists} (Audio)`, message,3);
+                        resolve(songsToAdd.push(song));
+                    }).catch(error=>{
+                        reject(error);
+                    })
                 })
             }
             else if (args.includes('album')) {
@@ -121,7 +125,7 @@ async function linkify(args, message) {
                     track.artists.forEach(artist => {
                         artists = artists + ` ${artist.name}`
                     });
-                    let song = await yt_search(`${track.name} - ${artists}`, message)
+                    let song = await yt_search(`${track.name} - ${artists} (Audio)`, message,3)
                     if (song)
                         songsToAdd[index]= song;
                     else
@@ -146,7 +150,7 @@ async function linkify(args, message) {
                             trackInfo.track.artists.forEach(artist => {
                                 artists = artists + ` ${artist.name}`;
                             })
-                            let song = await yt_search(`${trackInfo.track.name} - ${artists}`,message,3);
+                            let song = await yt_search(`${trackInfo.track.name} - ${artists} (Audio)`,message,3);
                             if (song)
                                 songs[index]=song;
                         }))
@@ -174,7 +178,6 @@ async function linkify(args, message) {
         songsToAdd.push(song);
     }
     songsToAdd = songsToAdd.filter(Boolean);
-    console.log("bruh");
     message.channel.send(`Added ${songsToAdd.length} songs to the queue`);
     return songsToAdd;
 }
