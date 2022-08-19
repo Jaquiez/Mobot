@@ -1,11 +1,11 @@
 const { AudioPlayer, AudioResource, createAudioResource, AudioPlayerStatus } = require('@discordjs/voice')
-const {MessageEmbed} = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const queuehandler = require('../handlers/queuehandler');
 const ytdl = require('ytdl-core')
+const play = require('play-dl')
 let player;
-async function playSong(serverQueue,guildId,message) {
-    if(serverQueue.songs.length==0)
-    {
+async function playSong(serverQueue, guildId, message) {
+    if (serverQueue.songs.length == 0) {
         queuehandler.masterQueue.delete(guildId);
         serverQueue.connection.destroy();
         return;
@@ -14,38 +14,35 @@ async function playSong(serverQueue,guildId,message) {
     const embed = new MessageEmbed()
         .setTitle(`**Now playing ↓ | Loop status ${serverQueue.loop}**`)
         .setDescription(`[${song.title}](${song.url}) | Requested by ${song.requester}`);
-    
-    const msg = await message.channel.send({embeds:[embed]});
+
+    const msg = await message.channel.send({ embeds: [embed] });
     player = new AudioPlayer()
-        .on(AudioPlayerStatus.Idle,()=>{
-            if(!serverQueue.loop)
+        .on(AudioPlayerStatus.Idle, () => {
+            if (!serverQueue.loop)
                 serverQueue.songs.shift();
             msg.delete();
-            playSong(serverQueue,guildId,message);
+            playSong(serverQueue, guildId, message);
         })
-        .on('error',(e)=>{
+        .on('error', (e) => {
             serverQueue.songs.shift();
             embed.setTitle("An error has occurred");
             embed.setDescription(`${e}`);
-            msg.edit({embeds:[embed]});
-            setTimeout(()=>{
+            msg.edit({ embeds: [embed] });
+            setTimeout(() => {
                 msg.delete();
-            },5000)
-            playSong(serverQueue,guildId,message);
+            }, 5000)
+            playSong(serverQueue, guildId, message);
         })
-    const stream = ytdl(song.url, {
-        requestOptions:{
-            headers:{
-                'x-youtube-identity-token': process.env.YT_CLIENT,
-                cookie: process.env.YT_COOKIE
-            }
-        },
-        filter: 'audioonly',
-        quality: 'highestaudio',
-        highWaterMark: 1 << 25,
-
+    play.setToken({
+        youtube: {
+            cookie: `${process.env.YT_COOKIE}`
+        }
     })
-    let resource = createAudioResource(stream);
+    let stream = await play.stream(song.url);
+    let resource = createAudioResource(stream.stream, {
+        inputType: stream.type
+    });
+
     player.play(resource);
     serverQueue.player = player;
     serverQueue.connection.subscribe(player);
