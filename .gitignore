@@ -4,5 +4,3 @@ node_modules
 .env
 #file for what
 package-lock.json
-secret.js
-secret2.js

@@ -1,31 +1,25 @@
-const {joinVoiceChannel, entersState, VoiceConnectionStatus} = require('@discordjs/voice');
-const queuehandler = require('../handlers/queuehandler');
-const { linkify } = require('../handlers/songhandler');
-const player = require('../player/player');
-async function execute(message,client) {
-    let guildId = message.channel.guildId;
-    if(!queuehandler.masterQueue.has(guildId))
-    {
-        const errnum = await require('./join.js').execute(message,client);
-        if(errnum===-1)
-            return;
-    }
-    let args = message.content.substring(message.content.indexOf(' ')+1);
-    let songs = await linkify(args,message);
-    let serverQueue = queuehandler.masterQueue.get(guildId);
-    songs.forEach(song=>{
-        serverQueue.songs.push(song)
-    });
-    if(serverQueue.player==null)
-    {
-        player.playSong(serverQueue,guildId,message);
-    }
-
+const Discord = require("discord.js");
+const masterQueue = require("../helpers/MasterQueue.js");
+const songHandler = require("../handlers/songhandler.js");
+async function execute(message, client) {
+  let voiceChannel = message.member.voice.channel;
+  if (!voiceChannel) {
+    return require("../commands/join.js").execute(message, client);
+  }
+  if (!masterQueue.contains(voiceChannel.guild.id)) {
+    require("../commands/join.js").execute(message, client);
+  }
+  let args = message.content.split("-play ").slice(1)[0];
+  let serverQueue = masterQueue.getEntry(voiceChannel.guild.id);
+  let songs = await songHandler.linkify(args, message);
+  serverQueue.songs = serverQueue.songs.concat(songs);
+  if (serverQueue.mobotPlayer.player._state.status === "idle") {
+    serverQueue.mobotPlayer.playNextSong();
+  }
 }
 
 module.exports = {
-    altnames: ['p'],
-    perms: [],
-    desc: "MoBot will play the song in the [argument]",
-    execute
-}
+  perms: [],
+  desc: "Clones and destroys a channel",
+  execute,
+};

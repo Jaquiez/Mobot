@@ -1,4 +1,7 @@
 {
+  "name":"Mobot",
+  "version":"1.0.0",
+  "main":"app.js",
   "dependencies": {
     "@discordjs/opus": "^0.5.3",
     "@discordjs/voice": "^0.9.0",
@@ -11,8 +14,6 @@
     "opusscript": "^0.0.8",
     "play-dl": "^1.9.5",
     "sodium": "^3.0.2",
-    "spotify-web-api-node": "^5.0.2",
-    "ytdl": "^1.4.1",
-    "ytdl-core": "^4.11.0"
+    "spotify-web-api-node": "^5.0.2"
   }
 }

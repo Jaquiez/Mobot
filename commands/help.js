@@ -1,18 +1,16 @@
-const {MessageEmbed} = require('discord.js');
-async function execute(message,client) {
-    let help = "";
-    require('../handlers/command_handler.js').commands.forEach(command=>{
-        help = help + `**${command.name}**: ${command.desc}\n`;
-    })
-    const embed = new MessageEmbed()
-        .setTitle('Commands')
-        .setDescription(help)
-    message.channel.send({embeds:[embed]});    
+const { MessageEmbed } = require("discord.js");
+async function execute(message, client) {
+  let cmds = require("../handlers/command_handler.js").commands;
+  let help = Object.entries(cmds).reduce(
+    (acc, [k, v]) => acc + `**${k}**: ${v.desc} \n`,
+    ""
+  );
+  const embed = new MessageEmbed().setTitle("Commands").setDescription(help);
+  message.channel.send({ embeds: [embed] });
 }
 
 module.exports = {
-    perms: [],
-    desc: "bruh :|",
-    execute
-}
-    
+  perms: [],
+  desc: "bruh :|",
+  execute,
+};

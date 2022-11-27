@@ -1,19 +1,22 @@
-const {joinVoiceChannel, entersState, VoiceConnectionStatus, AudioPlayerStatus} = require('@discordjs/voice');
-const queuehandler = require('../handlers/queuehandler');
-async function execute(message,client) {
-    
-    let guildId = message.channel.guildId;
-    if(!queuehandler.masterQueue.has(guildId))
-    {
-        message.channel.send("I'm not in a channel!");
-        return;
-    }
-    queuehandler.masterQueue.get(guildId).player.stop();
-
+const Discord = require("discord.js");
+const masterQueue = require("../helpers/MasterQueue.js");
+function execute(message, client) {
+  let voiceChannel = message.member.voice.channel;
+  if (!voiceChannel) {
+    message.reply("You're not in a voice channel!");
+    return;
+  }
+  let guildId = voiceChannel.guild.id;
+  if (!masterQueue.contains(guildId)) {
+    message.reply("I'm not in a voice channel! Use -join to get me in one!");
+    return;
+  }
+  let serverQueue = masterQueue.getEntry(guildId);
+  serverQueue.mobotPlayer.playNextSong();
 }
 
 module.exports = {
-    perms: [],
-    desc: "MoBot will skip the current song",
-    execute
-}
+  perms: [],
+  desc: "Clones and destroys a channel",
+  execute,
+};
