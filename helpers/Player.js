@@ -40,7 +40,9 @@ class Player {
         .setDescription(
           `[${song.title}](${song.url}) | Requested by ${song.requester}`
         );
-      this.serverQueue.messageChannel.send({ embeds: [embed] });
+      let msg = await this.serverQueue.messageChannel.send({ embeds: [embed] });
+      //One time listener to delete the message
+      this.player.once(AudioPlayerStatus.Idle,()=>msg.delete())
       let resource = await this.#createYTResource(song);
       this.player.play(resource);
       this.serverQueue.connection.subscribe(this.player);

@@ -12,7 +12,7 @@ function execute(message, client) {
     return;
   }
   let serverQueue = masterQueue.getEntry(guildId);
-  serverQueue.mobotPlayer.playNextSong();
+  serverQueue.mobotPlayer.player._events.idle.forEach(f=>f())
 }
 
 module.exports = {

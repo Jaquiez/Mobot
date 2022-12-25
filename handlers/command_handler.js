@@ -24,7 +24,18 @@ function handle(message, client) {
       message.reply("Invalid perms!");
     }
     return;
-  }
+  } 
+  Object.keys(commands).some((key)=>{
+    cmd2 = commands[key];
+    if(cmd2.altnames!=undefined && cmd2.altnames.some(cmdName => cmd===cmdName)){
+      if(checkPerms(key,message)){
+        require(`../commands/${key}.js`).execute(message, client);
+      }else{
+        message.reply("Invalid perms!");
+      }
+      return true;
+    }
+  })
 }
 
 module.exports = { handle, create, commands };

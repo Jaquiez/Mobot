@@ -62,5 +62,6 @@ async function execute(message, client) {
 module.exports = {
   perms: [],
   desc: "Shows the queue of songs.",
+  altnames:['q'],
   execute,
 };
