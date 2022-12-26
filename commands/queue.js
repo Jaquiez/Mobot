@@ -57,6 +57,9 @@ async function execute(message, client) {
         }
       }
     }
+    else{
+      message.reply("There is no queue!");
+    }
 }
 
 module.exports = {

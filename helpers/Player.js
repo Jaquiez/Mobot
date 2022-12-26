@@ -11,12 +11,14 @@ class Player {
     this.serverQueue = serverQueue;
     this.player = new AudioPlayer()
       .on(AudioPlayerStatus.Idle, () => {
+        if(this.serverQueue.loop){this.serverQueue.songs.unshift(this.song);}
         this.playNextSong();
       })
       .on("error", (e) => {
         console.log(e);
         this.playNextSong();
       });
+    this.song;
   }
   #createYTResource(song) {
     return new Promise(async (res, rej) => {
@@ -30,6 +32,7 @@ class Player {
   async playNextSong() {
     if (this.serverQueue.songs.length > 0) {
       let song = this.serverQueue.songs.shift();
+      this.song = song;
       if(song.media==="Spotify"){
         let songDetails = await song.getSong();
         song.url = songDetails.url;
@@ -42,7 +45,9 @@ class Player {
         );
       let msg = await this.serverQueue.messageChannel.send({ embeds: [embed] });
       //One time listener to delete the message
-      this.player.once(AudioPlayerStatus.Idle,()=>msg.delete())
+      this.player.once(AudioPlayerStatus.Idle,()=>{
+        msg.delete()
+      })
       let resource = await this.#createYTResource(song);
       this.player.play(resource);
       this.serverQueue.connection.subscribe(this.player);
