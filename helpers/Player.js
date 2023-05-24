@@ -4,7 +4,7 @@ const {
   AudioPlayerStatus,
 } = require("@discordjs/voice");
 const { MessageEmbed } = require("discord.js");
-const play = require("play-dl");
+const ytdl = require('ytdl-core');
 
 class Player {
   constructor(serverQueue) {
@@ -22,10 +22,12 @@ class Player {
   }
   #createYTResource(song) {
     return new Promise(async (res, rej) => {
-      let stream = await play.stream(song.url);
-      let resource = createAudioResource(stream.stream, {
-        inputType: stream.type,
+      let stream = await ytdl(song.url,
+        { 
+        filter: 'audioonly',
+        quality:'highestaudio'
       });
+      let resource = createAudioResource(stream);
       return res(resource);
     });
   }

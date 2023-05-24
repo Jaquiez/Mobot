@@ -1,20 +1,20 @@
 const YTHelper = require("../helpers/YTSongHelper.js");
 const SpotHelper = require("../helpers/SpotifySongHelper.js")
-const{ yt_validate,video_info}= require('play-dl');
+const ytdl = require('ytdl-core');
+
 //Translates our query, whatever it is to a youtube link + metadata
 async function linkify(args, message) {
   let songsToAdd = [];
   let reSpot = /^https:\/\/open.spotify.com/;
-  if(yt_validate(args) === 'video'){
-    let info = await video_info(args);
+  if(ytdl.validateURL(args)){
+    let info = await ytdl.getInfo(args);
     songsToAdd.push({
-      title: info.video_details.title,
-      url: info.video_details.url
+      title: info.videoDetails.title,
+      url: `https://www.youtube.com/watch?v=${info.videoDetails.videoId}`
     })
   }
-  else if(yt_validate(args)==='playlist'){
+  else if(/youtube.com\/playlist\?list=[a-zA-Z0-9_-]+/.test(args)){
     let listId = args.replace(/.*list=/,"").replace(/&.*/,"");
-    console.log(listId);
     songsToAdd = await YTHelper.get_playlist_videos(listId);
   }
   else if(reSpot.test(args)){
